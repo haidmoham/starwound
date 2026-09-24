@@ -1,11 +1,15 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { FIXED_DT, FixedClock } from "../core/clock.ts";
-import { featureAt } from "../core/audio.ts";
-import type { FeatureTimeline } from "../core/audio.ts";
-import { SILENCE, syntheticForcing } from "../core/forcing.ts";
+import { syntheticForcing } from "../core/forcing.ts";
 import { HISTORY_CAPACITY, HISTORY_STRIDE, OrbitWorld } from "../core/orbit.ts";
 import type { OrbitParameters } from "../core/orbit.ts";
+
+// Canvas has a downward y axis, so this is the opposite sign of the backdrop's rotation.
+const PROJECTION_ANGLE = 0.33;
+const PROJECTION_HEIGHT = 0.59;
+const PROJECTION_COS = Math.cos(PROJECTION_ANGLE);
+const PROJECTION_SIN = Math.sin(PROJECTION_ANGLE);
 
 export interface ViewParameters {
   exposure: number;
@@ -18,9 +22,16 @@ interface Props {
   view: Readonly<ViewParameters>;
   paused: boolean;
   onError: (message: string) => void;
-  audio: HTMLAudioElement | null;
-  timeline: FeatureTimeline | null;
   resetKey: number;
+}
+
+function createOpeningWorld(parameters: Readonly<OrbitParameters>): OrbitWorld {
+  const world = new OrbitWorld(parameters);
+  // The exhibition opens on a developed trajectory, not an empty first frame.
+  for (let tick = 0; tick < Math.floor(3 / FIXED_DT); tick++) {
+    world.step(syntheticForcing(world.time));
+  }
+  return world;
 }
 
 function startCanvasFallback(
@@ -28,12 +39,10 @@ function startCanvasFallback(
   parameters: Readonly<OrbitParameters>,
   viewRef: React.RefObject<Readonly<ViewParameters>>,
   pausedRef: React.RefObject<boolean>,
-  audio: HTMLAudioElement | null,
-  timeline: FeatureTimeline | null,
 ): () => void {
   const context = canvas.getContext("2d");
   if (!context) return () => {};
-  const world = new OrbitWorld(parameters);
+  const world = createOpeningWorld(parameters);
   const clock = new FixedClock();
   let frame = 0;
   let previous = performance.now();
@@ -42,15 +51,7 @@ function startCanvasFallback(
     previous = now;
     if (!document.hidden) {
       if (pausedRef.current) clock.discard();
-      else if (audio && timeline) {
-        const target = Math.floor(
-          Math.min(audio.currentTime, timeline.duration) / FIXED_DT,
-        );
-        for (let count = 0; world.ticks < target && count < 2400; count++)
-          world.step(featureAt(timeline, world.time));
-        if (audio.ended && world.ticks >= target)
-          clock.advance(elapsed, () => world.step(SILENCE));
-      } else
+      else
         clock.advance(elapsed, () => world.step(syntheticForcing(world.time)));
       const rect = canvas.getBoundingClientRect();
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -60,9 +61,14 @@ function startCanvasFallback(
         canvas.width = width;
         canvas.height = height;
       }
-      context.fillStyle = "#080c11";
-      context.fillRect(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
       const scale = Math.min(width, height) / (2 * viewRef.current.extent);
+      const project = (x: number, y: number): [number, number] => {
+        const projectedY = y * PROJECTION_HEIGHT;
+        const rotatedX = PROJECTION_COS * x - PROJECTION_SIN * projectedY;
+        const rotatedY = PROJECTION_SIN * x + PROJECTION_COS * projectedY;
+        return [width / 2 + rotatedX * scale, height / 2 - rotatedY * scale];
+      };
       const samples = Math.min(
         world.historyCount,
         Math.max(
@@ -76,7 +82,7 @@ function startCanvasFallback(
         const older =
           (world.historyHead - age + HISTORY_CAPACITY) % HISTORY_CAPACITY;
         const newer = (older + 1) % HISTORY_CAPACITY;
-        context.strokeStyle = `rgba(234,174,151,${(0.07 + 0.38 * (1 - age / samples)) * viewRef.current.exposure})`;
+        context.strokeStyle = `rgba(255,223,198,${(0.08 + 0.66 * (1 - age / samples)) * viewRef.current.exposure})`;
         context.beginPath();
         for (
           let particle = 0;
@@ -85,21 +91,19 @@ function startCanvasFallback(
         ) {
           const a = (older * parameters.particleCount + particle) * 2;
           const b = (newer * parameters.particleCount + particle) * 2;
-          context.moveTo(
-            width / 2 + world.history[a] * scale,
-            height / 2 - world.history[a + 1] * scale,
-          );
-          context.lineTo(
-            width / 2 + world.history[b] * scale,
-            height / 2 - world.history[b + 1] * scale,
-          );
+          const start = project(world.history[a], world.history[a + 1]);
+          const end = project(world.history[b], world.history[b + 1]);
+          context.moveTo(start[0], start[1]);
+          context.lineTo(end[0], end[1]);
         }
         context.stroke();
       }
-      context.fillStyle = "#f0c6af";
+      context.fillStyle = "#fff5e5";
       for (let particle = 0; particle < parameters.particleCount; particle++) {
-        const x = width / 2 + world.positions[particle * 2] * scale;
-        const y = height / 2 - world.positions[particle * 2 + 1] * scale;
+        const [x, y] = project(
+          world.positions[particle * 2],
+          world.positions[particle * 2 + 1],
+        );
         context.fillRect(x, y, 1.5 * pixelRatio, 1.5 * pixelRatio);
       }
     }
@@ -114,8 +118,6 @@ export function OrbitalCanvas({
   view,
   paused,
   onError,
-  audio,
-  timeline,
   resetKey,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -137,6 +139,7 @@ export function OrbitalCanvas({
         canvas,
         antialias: true,
         preserveDrawingBuffer: true,
+        alpha: true,
         powerPreference: "low-power",
       });
     } catch {
@@ -151,8 +154,6 @@ export function OrbitalCanvas({
         parameters,
         viewRef,
         pausedRef,
-        audio,
-        timeline,
       );
       return () => {
         stop();
@@ -162,11 +163,11 @@ export function OrbitalCanvas({
     }
     onError("");
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-    renderer.setClearColor("#080c11");
+    renderer.setClearColor(0x000000, 0);
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
     camera.position.z = 10;
-    const world = new OrbitWorld(parameters);
+    const world = createOpeningWorld(parameters);
     const clock = new FixedClock();
     const maxSegments = parameters.particleCount * (HISTORY_CAPACITY - 1);
     const segmentPositions = new Float32Array(maxSegments * 6);
@@ -193,6 +194,8 @@ export function OrbitalCanvas({
     });
     const trails = new THREE.LineSegments(geometry, material);
     trails.frustumCulled = false;
+    trails.scale.y = PROJECTION_HEIGHT;
+    trails.rotation.z = PROJECTION_ANGLE;
     scene.add(trails);
     const tipPositions = new Float32Array(parameters.particleCount * 3);
     const tipGeometry = new THREE.BufferGeometry();
@@ -203,7 +206,7 @@ export function OrbitalCanvas({
       ),
     );
     const tipMaterial = new THREE.PointsMaterial({
-      color: "#e8af9b",
+      color: "#fff1dc",
       size: 1.5,
       sizeAttenuation: false,
       transparent: true,
@@ -211,6 +214,8 @@ export function OrbitalCanvas({
     });
     const tips = new THREE.Points(tipGeometry, tipMaterial);
     tips.frustumCulled = false;
+    tips.scale.y = PROJECTION_HEIGHT;
+    tips.rotation.z = PROJECTION_ANGLE;
     scene.add(tips);
 
     let aspect = 1;
@@ -237,19 +242,7 @@ export function OrbitalCanvas({
       previous = now;
       if (!document.hidden && !contextLost) {
         if (pausedRef.current) clock.discard();
-        else if (audio && timeline) {
-          // Playback time owns the target tick. Never skip model state on a seek.
-          const target = Math.floor(
-            Math.min(audio.currentTime, timeline.duration) / FIXED_DT,
-          );
-          let steps = 0;
-          while (world.ticks < target && steps < 2400) {
-            world.step(featureAt(timeline, world.time));
-            steps++;
-          }
-          if (audio.ended && world.ticks >= target)
-            clock.advance(elapsed, () => world.step(SILENCE));
-        } else
+        else
           clock.advance(elapsed, () =>
             world.step(syntheticForcing(world.time)),
           );
@@ -282,8 +275,8 @@ export function OrbitalCanvas({
             segmentPositions[cursor + 5] = 0;
             for (let end = 0; end < 2; end++) {
               segmentColors[cursor + end * 3] = brightness;
-              segmentColors[cursor + end * 3 + 1] = brightness * 0.81;
-              segmentColors[cursor + end * 3 + 2] = brightness * 0.76;
+              segmentColors[cursor + end * 3 + 1] = brightness * 0.72;
+              segmentColors[cursor + end * 3 + 2] = brightness * 0.56;
             }
             cursor += 6;
           }
@@ -299,10 +292,11 @@ export function OrbitalCanvas({
         tipGeometry.getAttribute("position").needsUpdate = true;
         material.opacity = currentView.exposure;
         tipMaterial.opacity = Math.min(1, currentView.exposure + 0.2);
-        camera.left = -currentView.extent * aspect;
-        camera.right = currentView.extent * aspect;
-        camera.top = currentView.extent;
-        camera.bottom = -currentView.extent;
+        const halfHeight = currentView.extent * Math.max(1, 1 / aspect);
+        camera.left = -halfHeight * aspect;
+        camera.right = halfHeight * aspect;
+        camera.top = halfHeight;
+        camera.bottom = -halfHeight;
         camera.updateProjectionMatrix();
         renderer.render(scene, camera);
       } else {
@@ -322,13 +316,13 @@ export function OrbitalCanvas({
       renderer.dispose();
       renderer.forceContextLoss();
     };
-  }, [parameters, onError, audio, timeline, resetKey]);
+  }, [parameters, onError, resetKey]);
 
   return (
     <canvas
       className="world"
       ref={canvasRef}
-      aria-label="Orbital trajectories. A local recording changes particle momentum when loaded."
+      aria-label="Autonomous orbital trajectories around a fixed softened attractor."
     />
   );
 }

@@ -1,5 +1,14 @@
 # Verification ledger
 
+## Tidal installation revision — 2026-09-24, local
+
+- `npm run check` passed: TypeScript, Oxlint, and 13 tests. Two new tests cover common YouTube URL forms and rejection of unrelated or malformed URLs. `npm run build` passed with Vite's existing large-chunk warning; `git diff --check` passed.
+- Browser screenshots were inspected at 1440 × 900 and 390 × 844. The framed stage, full-field view, and tuning sheet rendered without horizontal overflow at 390 px. This browser used Canvas 2D fallback because WebGL was unavailable; hardware WebGL and a physical phone remain unverified.
+- An empty link entered the work. An unrelated URL stayed at the entrance with a validation message. A nonmusic YouTube video loaded in the dock and its embedded Play control worked. A video that forbade embedding showed YouTube's unavailable state; the dock retained its `open on youtube` fallback link.
+- Changing between frame and full field left the player mounted. At desktop width, the dock moved by pointer drag, moved 10 CSS pixels by one arrow-key press, and returned to its original position with reset. The 390 px tuning sheet hid the dock while open so the two surfaces did not collide.
+- Freeze held both the authored backdrop and the trajectory canvas byte-for-byte across a one-second wait. Resume changed both. Still export produced a 1020 × 466 PNG containing the authored backdrop and modeled trajectories.
+- The link is used only to select an iframe ID; no video or audio value enters the model, its clock, or either renderer. End-to-end playback continuity on a physical phone remains unverified.
+
 ## Live mirrored domains — 2026-09-24
 
 - Cloudflare has DNS-only `CNAME starwound → 6891e8c0e292e643.vercel-dns-017.com` in both `shin86.dev` and `mhaider.dev`. Each record was confirmed in the Cloudflare DNS table. The authoritative Cloudflare nameserver returned the `mhaider.dev` CNAME; public resolvers returned the `shin86.dev` CNAME and one public resolver returned the new `mhaider.dev` CNAME while caches were still updating.
