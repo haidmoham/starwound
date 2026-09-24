@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+local-audio/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tsbuildinfo
