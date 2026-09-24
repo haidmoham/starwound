@@ -1,5 +1,14 @@
 # Verification ledger
 
+## V1 local pass — 2026-09-24
+
+- `npm install --no-audit --no-fund` generated `package-lock.json`; CI now uses `npm ci`.
+- `npm run check`: TypeScript, Oxlint, and 12 core tests passed.
+- `npm run build`: passed. Vite reported a 766 kB JavaScript chunk warning; this is a size warning, not a build failure.
+- Browser at `http://127.0.0.1:5173/`: inspected 1280×633 and 390×844 screenshots. No horizontal overflow at 390 px. The browser lacked WebGL, so Canvas 2D fallback showed the orbital trajectories.
+- Uploaded a generated four-second WAV fixture. The UI changed to `your recording`; playback time advanced to 2.58 s, and restart paused audio at 0 s. The YouTube dock opened at 390 px; playback of an external video was not verified.
+- The browser pass does not establish performance or appearance on a physical phone or a hardware WebGL browser. No commercial recording was tested.
+
 ## Initial setup — 2026-09-24
 
 ### Hosted CI: passed
