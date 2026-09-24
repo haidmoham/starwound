@@ -1,55 +1,40 @@
 # Architecture and model contract
 
-## Stack lineage
-
-The frontend baseline was read from `haidmoham/seaglass/package.json` on 2026-09-24: React 19, TypeScript, Vite 8, Three.js, Oxlint, npm, Node/tsx tests, and ordinary CSS. `soundspace/package.json` also confirmed npm and Oxlint. Versions in this scaffold follow Seaglass's manifest; registry installation was blocked in the setup environment. No package compatibility or production-build result is implied by copying them.
-
-We have not copied Seaglass's backend, search integration, or repository-local anti-slop lint plugin. The baseline Oxlint configuration is intentionally standalone.
-
-## Implemented boundaries
+## Boundaries
 
 ```text
-src/core/forcing.ts  synthetic normalized input -> bounded external-drive strength
-src/core/orbit.ts    fixed-step world state + bounded trajectory history
-src/core/clock.ts    wall-clock preview -> fixed tick requests
-src/render/         world/history -> Three.js buffers + observer controls
-src/App.tsx         React controls, restart, pause, errors, presentation
+src/core/forcing.ts             deterministic autonomous drive
+src/core/orbit.ts               seeded fixed-step state and bounded history
+src/core/clock.ts               wall-time preview to fixed tick requests
+src/render/OrbitalCanvas.tsx    modeled trajectories, WebGL and Canvas 2D
+src/render/RuptureBackdrop.tsx  authored projected field and ejecta
+src/YouTubeMini.tsx             independent, optional YouTube dock
+src/App.tsx                     entrance, controls, lifecycle, still export
 ```
 
-Core modules do not import React, Three.js, DOM APIs, or audio APIs. The renderer cannot rewrite the world's coordinates to make a beat visible. Typed arrays and GPU resources have bounded allocation. Rendering settings are held separately from model parameters.
+The YouTube URL becomes an embed ID only. It is never passed to the model, forcing function, clock, or renderers. No audio analysis, file upload, or media synchronization exists. The renderer keeps its world instance when the CSS stage changes from framed to immersive.
 
-## Seed model
+## Model
 
-Coordinates and time are dimensionless. Particles move in a plane; Three.js presents them in an orthographic view. There is one fixed attractor, `mu = 1`, with softening `epsilon = 0.12`:
+Coordinates and time are dimensionless. Particles move in a plane around one fixed attractor, with `mu = 1` and softening `epsilon = 0.12`:
 
 ```text
-a_gravity(r) = -mu * r / (|r|^2 + epsilon^2)^(3/2)
-Phi(r)      = -mu / sqrt(|r|^2 + epsilon^2)
+a_gravity(r) = -mu * r / (|r|² + epsilon²)^(3/2)
+Phi(r)      = -mu / sqrt(|r|² + epsilon²)
 ```
 
-A seeded narrow arc supplies initial positions. The angular-momentum control multiplies the local softened circular speed; it is a dimensionless speed factor, not an absolute conserved angular-momentum value. Dispersion introduces bounded initial velocity variation.
+A seeded narrow arc supplies initial positions. The momentum control is a multiplier on local softened circular speed, not absolute angular momentum. Dispersion adds bounded initial velocity variation. The autonomous external drive points in +y and has a Gaussian envelope near `(1.2, 0)`. It is an authored perturbation, not a measurement from a song or video.
 
-The current external drive points in +y and has a Gaussian spatial envelope centered at `(1.2, 0)`. Its amplitude is `receptivity * (0.012 * energy + 0.08 * onset)`. These coefficients are authored choices, not measured astrophysical constants. The synthetic `onset` value is an envelope, not a discrete physical impulse. Drive is held constant over each tick.
+Integration uses kick-drift-kick at 120 Hz. The history ring holds 128 samples at one sample per eight ticks, roughly 8.5 simulated seconds. Recent trajectory history is visual evidence of state; it does not exert force. Every scene opens after three deterministic seconds of model evolution so the first frame has structure. A reset returns to that opening state.
 
-Integration is kick-drift-kick at 120 Hz. Energy conservation applies to the unforced softened model, not to the externally driven scene. The included aggregate-energy check is a smoke test, not a general error-bound proof. Convergence, angular momentum, extreme configurations, and long-run behavior need additional validation as the model expands.
+`FixedClock` caps a wall frame at 100 ms and drops paused or hidden-tab partial time. This bounds preview catch-up. It is not an exact real-time physical clock. Seed, initial conditions, and autonomous forcing determine replay; view controls change observation without restarting the world.
 
-## History and clocks
+## Projection and materials
 
-The ring buffer stores 128 samples at one sample per eight ticks: roughly 8.5 simulated seconds of recent trajectories. It is NOT a whole-recording archive. Current positions/velocities carry dynamical state; fading/displayed trails do not exert forces. No ecological scarring or irreversible material change is implemented.
+WebGL lines and Canvas 2D fallback use the same orthographic projection: vertical factor `0.59` followed by a `0.33` world-space rotation, equivalent to `-0.33` in the backdrop canvas's downward-y coordinates. The starfield, incandescent annulus, and ejecta are drawn procedurally with a seeded random generator. Their slow phase is paused with the model and held still under reduced motion. They are authored presentation, not gravitational lensing, an accretion-fluid solver, or general relativity.
 
-`FixedClock` caps a wall frame at 100 ms and discards paused/hidden-tab partial time. That keeps the synthetic preview bounded. It deliberately loses wall time on long frames and is unsuitable as an audio-master clock.
+The framed and immersive layouts share the same mounted canvas. Resize observers update pixels and cameras without recreating model state. WebGL buffers, geometries, materials, animation frames, and observers are disposed on teardown. Still export composites the authored backdrop and the visible trajectory canvas.
 
-The audio slice must use an explicit transport with simulation tick targets derived from the authoritative playback time. Define behavior for pause, resume, hidden tabs, seeking, and end-of-track. A seek must restore a checkpoint and replay, or restart/replay; it must not set only `world.time` while leaving the state unchanged. At the end, stop external musical input while allowing already-started dynamics to continue when exhibition mode calls for it.
+## Release
 
-## Next vertical slice
-
-1. Local audio selection, decode/analysis, and playback. No upload or streaming credentials.
-2. Deterministic feature timeline (minimum: energy and onset/novelty envelope), explicit normalization, and optional authored cues. Never relabel measured energy as inferred emotion.
-3. Audio-master synchronization with the existing pure model and bounded input coupling.
-4. Known-interesting presets and reproducible experiments. Store model/version, seed, analysis settings, recording fingerprint, cue/control timeline, and observer settings. Do not store private audio in exported presets.
-5. Save/reload configurations, then complete checkpoints (positions, velocities, tick, history, relevant RNG state) and still exports. Seeds alone do not reconstruct live-edited sessions.
-6. Profile on actual hardware; only then consider workers, instanced trail meshes, GPU simulation, or a new scientific family.
-
-## Deployment
-
-`vercel.json` describes a static Vite build producing `dist/`. No Vercel project, domain, secrets, or deployment was created by this setup. CI checks only; it does not deploy. CI temporarily runs `npm install` until Codex commits a real lockfile, then must switch to `npm ci`.
+`vercel.json` owns the static Vite build and routing. GitHub `main` is the Vercel production branch. The two mirrored custom domains have separate DNS and TLS verification. `index.html` revalidates; hashed assets are immutable. See [verification.md](verification.md) for observed results.

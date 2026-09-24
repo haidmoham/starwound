@@ -1,418 +1,373 @@
-import { useEffect, useRef, useState } from "react";
-import { analyzeSamples } from "./core/audio.ts";
-import type { FeatureTimeline } from "./core/audio.ts";
+import { useEffect, useState } from "react";
 import { DEFAULT_PARAMETERS } from "./core/orbit.ts";
 import type { OrbitParameters } from "./core/orbit.ts";
+import { parseYouTubeId } from "./core/youtube.ts";
 import { OrbitalCanvas } from "./render/OrbitalCanvas.tsx";
 import type { ViewParameters } from "./render/OrbitalCanvas.tsx";
+import { RuptureBackdrop } from "./render/RuptureBackdrop.tsx";
 import { YouTubeMini } from "./YouTubeMini.tsx";
 
-const PRESETS = [
-  { name: "orbit", momentum: 1.02, dispersion: 0.015, receptivity: 0.35 },
+const STUDIES = [
   { name: "fall", momentum: 0.66, dispersion: 0.018, receptivity: 0.72 },
-  { name: "scatter", momentum: 1.24, dispersion: 0.11, receptivity: 0.9 },
+  { name: "shear", momentum: 1.02, dispersion: 0.015, receptivity: 0.35 },
+  { name: "eject", momentum: 1.24, dispersion: 0.11, receptivity: 0.9 },
 ];
-const initial = {
+
+const INITIAL_PARAMETERS: OrbitParameters = {
   ...DEFAULT_PARAMETERS,
-  angularMomentum: PRESETS[0].momentum,
-  dispersion: PRESETS[0].dispersion,
-  receptivity: PRESETS[0].receptivity,
+  angularMomentum: STUDIES[0].momentum,
+  dispersion: STUDIES[0].dispersion,
+  receptivity: STUDIES[0].receptivity,
 };
-const clockText = (seconds: number) =>
-  `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 
 export function App() {
-  const [parameters, setParameters] = useState<OrbitParameters>({ ...initial });
-  const [draft, setDraft] = useState<OrbitParameters>({ ...initial });
+  const [parameters, setParameters] = useState<OrbitParameters>({
+    ...INITIAL_PARAMETERS,
+  });
+  const [draft, setDraft] = useState<OrbitParameters>({
+    ...INITIAL_PARAMETERS,
+  });
   const [view, setView] = useState<ViewParameters>({
-    exposure: 0.68,
+    exposure: 0.85,
     extent: 3.1,
     traceSeconds: 7,
   });
   const [paused, setPaused] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  const [entered, setEntered] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [exhibition, setExhibition] = useState(false);
-  const [timeline, setTimeline] = useState<FeatureTimeline | null>(null);
-  const [fileName, setFileName] = useState("");
-  const [position, setPosition] = useState(0);
+  const [link, setLink] = useState("");
+  const [videoId, setVideoId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const urlRef = useRef<string | null>(null);
-  const loadId = useRef(0);
 
   useEffect(() => {
     const hide = () => {
-      if (document.hidden) {
-        audioRef.current?.pause();
-        setPaused(true);
-      }
+      if (document.hidden) setPaused(true);
     };
     document.addEventListener("visibilitychange", hide);
-    return () => {
-      document.removeEventListener("visibilitychange", hide);
-      audioRef.current?.pause();
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-    };
+    return () => document.removeEventListener("visibilitychange", hide);
   }, []);
 
-  const loadAudio = async (file: File) => {
-    const current = ++loadId.current;
-    audioRef.current?.pause();
-    setPaused(true);
-    setBusy(true);
-    setError("");
-    try {
-      const context = new AudioContext();
-      let decoded: AudioBuffer;
-      try {
-        decoded = await context.decodeAudioData(await file.arrayBuffer());
-      } finally {
-        await context.close();
+  useEffect(() => {
+    const leave = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowControls(false);
+        setEntered(false);
       }
-      if (current !== loadId.current) return;
-      const channels = Array.from(
-        { length: decoded.numberOfChannels },
-        (_, index) => decoded.getChannelData(index),
-      );
-      const features = analyzeSamples(channels, decoded.sampleRate);
-      const url = URL.createObjectURL(file);
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-      urlRef.current = url;
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.load();
-      }
-      setTimeline(features);
-      setFileName(file.name);
-      setPosition(0);
-      setResetKey((value) => value + 1);
-    } catch {
-      if (current === loadId.current)
-        setError(
-          "this audio file could not be decoded. try another local file.",
-        );
-    } finally {
-      if (current === loadId.current) setBusy(false);
-    }
-  };
+    };
+    window.addEventListener("keydown", leave);
+    return () => window.removeEventListener("keydown", leave);
+  }, []);
 
-  const togglePlayback = async () => {
-    const audio = audioRef.current;
-    if (timeline && audio) {
-      if (!paused && !audio.paused) {
-        audio.pause();
-        setPaused(true);
+  const enter = (event: React.FormEvent) => {
+    event.preventDefault();
+    const value = link.trim();
+    if (value) {
+      const parsed = parseYouTubeId(value);
+      if (!parsed) {
+        setError("use a youtube video link, or leave this empty.");
         return;
       }
-      if (audio.ended) {
-        audio.currentTime = 0;
-        setResetKey((value) => value + 1);
-      }
-      try {
-        await audio.play();
-        setPaused(false);
-      } catch {
-        setError("playback was blocked. select play again.");
-      }
-    } else setPaused((value) => !value);
-  };
-  const restart = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      setVideoId(parsed);
     }
-    setPaused(true);
-    setPosition(0);
-    setResetKey((value) => value + 1);
+    setError("");
+    setEntered(true);
   };
+
+  const restart = () => {
+    setResetKey((value) => value + 1);
+    setPaused(false);
+  };
+
   const apply = (next: OrbitParameters) => {
     setParameters({ ...next });
     setDraft({ ...next });
     restart();
   };
+
   const saveStill = () => {
-    const canvas = [
+    const backdrop = document.querySelector<HTMLCanvasElement>(
+      "canvas.rupture-backdrop",
+    );
+    const world = [
       ...document.querySelectorAll<HTMLCanvasElement>("canvas.world"),
     ].find((item) => getComputedStyle(item).display !== "none");
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = "starwound.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    if (!backdrop || !world) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = backdrop.width;
+    canvas.height = backdrop.height;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.drawImage(backdrop, 0, 0, canvas.width, canvas.height);
+    context.drawImage(world, 0, 0, canvas.width, canvas.height);
+    const anchor = document.createElement("a");
+    anchor.download = `starwound-${parameters.seed}.png`;
+    anchor.href = canvas.toDataURL("image/png");
+    anchor.click();
   };
 
   return (
-    <main className={exhibition ? "exhibition" : ""}>
-      <OrbitalCanvas
-        parameters={parameters}
-        view={view}
-        paused={paused}
-        onError={setError}
-        audio={timeline ? audioRef.current : null}
-        timeline={timeline}
-        resetKey={resetKey}
-      />
-      <audio
-        ref={audioRef}
-        preload="metadata"
-        onTimeUpdate={(event) => setPosition(event.currentTarget.currentTime)}
-        onError={() => {
-          if (timeline)
-            setError("audio playback failed. try another local file.");
-        }}
-      />
-      <a className="skip-link" href="#instrument">
-        skip to instrument
+    <main
+      className={`gallery ${entered ? "entered" : ""} ${showControls ? "tuning-open" : ""}`}
+    >
+      <a className="skip-link" href="#field-controls">
+        skip to controls
       </a>
-      <header className="masthead">
-        <a href="https://shin86.dev/">← shin86.dev</a>
-        <span>an orbital study / 001</span>
-        <button type="button" onClick={() => setExhibition(!exhibition)}>
-          {exhibition ? "leave exhibition" : "exhibition ↗"}
+      <header className="gallery-header">
+        <a href="https://shin86.dev/" className="home-link">
+          ← shin86.dev
+        </a>
+        <span>starwound / 001</span>
+        <button type="button" onClick={() => setEntered(!entered)}>
+          {entered ? "frame ↙" : "full field ↗"}
         </button>
       </header>
-      <div className="identity">
-        <p className="eyebrow">science / generative process / music</p>
-        <h1>
-          star<span>wound</span>
-          <i>.</i>
-        </h1>
-        <p>a world keeps the shape of what passes through it.</p>
-      </div>
-      <div className="coordinate" aria-hidden="true">
-        <span>01 — softened newtonian motion</span>
-        <span>seed {parameters.seed}</span>
-      </div>
-      <aside
-        id="instrument"
-        className="instrument"
-        aria-label="Study instrument"
-      >
-        <div className="instrument-top">
-          <div>
-            <span className="eyebrow">now observing</span>
-            <strong>{timeline ? "your recording" : "synthetic current"}</strong>
-          </div>
-          <span className="live-indicator">
-            {paused ? "still" : "in motion"}
-            <i />
-          </span>
-        </div>
-        <div className="transport">
-          <button className="play" type="button" onClick={togglePlayback}>
-            {paused ? "play" : "pause"} <span>{paused ? "▶" : "Ⅱ"}</span>
-          </button>
-          <button type="button" onClick={restart}>
-            restart ↺
-          </button>
-          <button type="button" onClick={saveStill}>
-            save still ↓
-          </button>
-        </div>
-        <div className="audio-source">
-          <label htmlFor="audio-file">
-            {busy
-              ? "reading audio…"
-              : timeline
-                ? "replace local audio ↗"
-                : "choose local audio ↗"}
-          </label>
-          <input
-            id="audio-file"
-            type="file"
-            accept="audio/*"
-            disabled={busy}
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void loadAudio(file);
-              event.currentTarget.value = "";
-            }}
+
+      <section className="exhibit" aria-label="Starwound orbital installation">
+        <div className="artwork-frame">
+          <RuptureBackdrop seed={parameters.seed} paused={paused} />
+          <OrbitalCanvas
+            parameters={parameters}
+            view={view}
+            paused={paused}
+            onError={setError}
+            resetKey={resetKey}
           />
-          <p>
-            {timeline
-              ? `${fileName} · ${clockText(position)} / ${clockText(timeline.duration)}`
-              : "a local file drives the model. it stays on this device."}
-          </p>
+          <div className="art-grain" aria-hidden="true" />
+          <div className="art-index" aria-hidden="true">
+            <span>SW—001</span>
+            <span>softened newtonian study</span>
+          </div>
+          <div className="art-corner" aria-hidden="true">
+            ✳
+          </div>
         </div>
-        <div
-          className="preset-row"
-          role="group"
-          aria-label="World configurations"
-        >
-          {PRESETS.map((preset, index) => (
-            <button
-              key={preset.name}
-              type="button"
-              className={
-                parameters.angularMomentum === preset.momentum &&
-                parameters.dispersion === preset.dispersion
-                  ? "selected"
-                  : ""
-              }
-              onClick={() =>
-                apply({
-                  ...parameters,
-                  angularMomentum: preset.momentum,
-                  dispersion: preset.dispersion,
-                  receptivity: preset.receptivity,
-                })
-              }
-            >
-              <small>0{index + 1}</small>
-              {preset.name}
-            </button>
-          ))}
-        </div>
-        <button
-          className="detail-toggle"
-          type="button"
-          aria-controls="controls"
-          aria-expanded={showControls}
-          onClick={() => setShowControls(!showControls)}
-        >
-          {showControls ? "close instrument" : "tune the world"}
-          <span>{showControls ? "−" : "+"}</span>
-        </button>
-        {showControls && (
-          <div id="controls" className="controls">
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                apply(draft);
-              }}
-            >
-              <h2>
-                world <span>apply + restart</span>
-              </h2>
-              <label htmlFor="seed">
-                seed
-                <input
-                  id="seed"
-                  type="number"
-                  min="0"
-                  max="4294967295"
-                  step="1"
-                  required
-                  value={draft.seed}
-                  onChange={(event) =>
-                    setDraft({ ...draft, seed: Number(event.target.value) })
-                  }
-                />
-              </label>
-              <label htmlFor="momentum">
-                angular momentum{" "}
-                <output>{draft.angularMomentum.toFixed(2)}</output>
-              </label>
-              <input
-                id="momentum"
-                type="range"
-                min="0.4"
-                max="1.35"
-                step="0.01"
-                value={draft.angularMomentum}
-                onChange={(event) =>
-                  setDraft({
-                    ...draft,
-                    angularMomentum: Number(event.target.value),
-                  })
-                }
-              />
-              <label htmlFor="dispersion">
-                dispersion <output>{draft.dispersion.toFixed(3)}</output>
-              </label>
-              <input
-                id="dispersion"
-                type="range"
-                min="0"
-                max="0.15"
-                step="0.005"
-                value={draft.dispersion}
-                onChange={(event) =>
-                  setDraft({ ...draft, dispersion: Number(event.target.value) })
-                }
-              />
-              <label htmlFor="receptivity">
-                receptivity <output>{draft.receptivity.toFixed(2)}</output>
-              </label>
-              <input
-                id="receptivity"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={draft.receptivity}
-                onChange={(event) =>
-                  setDraft({
-                    ...draft,
-                    receptivity: Number(event.target.value),
-                  })
-                }
-              />
-              <button className="apply" type="submit">
-                apply + restart
-              </button>
-            </form>
-            <section aria-label="Observer controls">
-              <h2>
-                observer <span>live view only</span>
-              </h2>
-              <label htmlFor="exposure">
-                exposure <output>{view.exposure.toFixed(2)}</output>
-              </label>
-              <input
-                id="exposure"
-                type="range"
-                min="0.1"
-                max="1"
-                step="0.01"
-                value={view.exposure}
-                onChange={(event) =>
-                  setView({ ...view, exposure: Number(event.target.value) })
-                }
-              />
-              <label htmlFor="extent">
-                field of view <output>{view.extent.toFixed(1)}</output>
-              </label>
-              <input
-                id="extent"
-                type="range"
-                min="2"
-                max="7"
-                step="0.1"
-                value={view.extent}
-                onChange={(event) =>
-                  setView({ ...view, extent: Number(event.target.value) })
-                }
-              />
-              <label htmlFor="trace">
-                trace window <output>{view.traceSeconds.toFixed(1)}s</output>
-              </label>
-              <input
-                id="trace"
-                type="range"
-                min="0.5"
-                max="8"
-                step="0.5"
-                value={view.traceSeconds}
-                onChange={(event) =>
-                  setView({ ...view, traceSeconds: Number(event.target.value) })
-                }
-              />
-            </section>
-            <p className="model-note">
-              test particles around one fixed attractor. a local recording
-              changes a bounded external drive. this is neither relativity nor
-              gravitational lensing.
-            </p>
+        {!entered && (
+          <div className="placard">
+            <div>
+              <span>001 / a study of matter in flight</span>
+              <h1>
+                starwound<span>.</span>
+              </h1>
+            </div>
+            <span className="placard-aside">the field keeps moving.</span>
           </div>
         )}
-      </aside>
-      {!exhibition && <YouTubeMini />}
-      {error && (
+      </section>
+
+      {!entered && (
+        <form className="entrance" onSubmit={enter}>
+          <label htmlFor="entrance-link">
+            a youtube link <span>/ optional</span>
+          </label>
+          <div className="entrance-line">
+            <input
+              id="entrance-link"
+              type="url"
+              value={link}
+              onChange={(event) => setLink(event.target.value)}
+              placeholder="paste any video link"
+              autoComplete="off"
+            />
+            <button type="submit">
+              enter <span>↗</span>
+            </button>
+          </div>
+          {error && <p role="alert">{error}</p>}
+        </form>
+      )}
+
+      <nav className="study-rail" aria-label="Choose orbital study">
+        {STUDIES.map((study, index) => (
+          <button
+            key={study.name}
+            type="button"
+            aria-pressed={
+              parameters.angularMomentum === study.momentum &&
+              parameters.dispersion === study.dispersion
+            }
+            onClick={() =>
+              apply({
+                ...parameters,
+                angularMomentum: study.momentum,
+                dispersion: study.dispersion,
+                receptivity: study.receptivity,
+              })
+            }
+          >
+            <small>0{index + 1}</small> {study.name}
+          </button>
+        ))}
+      </nav>
+
+      <div
+        id="field-controls"
+        className="field-controls"
+        role="group"
+        aria-label="Field controls"
+      >
+        <button type="button" onClick={() => setPaused(!paused)}>
+          {paused ? "move ↗" : "freeze Ⅱ"}
+        </button>
+        <button type="button" onClick={restart}>
+          begin again ↺
+        </button>
+        <button type="button" onClick={saveStill}>
+          take a still ↓
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowControls(!showControls)}
+          aria-expanded={showControls}
+          aria-controls="tuning"
+        >
+          tune {showControls ? "−" : "+"}
+        </button>
+      </div>
+
+      {showControls && (
+        <aside
+          id="tuning"
+          className="tuning"
+          aria-label="Tune the orbital study"
+        >
+          <div className="tuning-head">
+            <span>the instrument</span>
+            <button
+              type="button"
+              onClick={() => setShowControls(false)}
+              aria-label="close tuning"
+            >
+              ×
+            </button>
+          </div>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              apply(draft);
+            }}
+          >
+            <label htmlFor="seed">
+              seed{" "}
+              <input
+                id="seed"
+                type="number"
+                min="0"
+                max="4294967295"
+                step="1"
+                required
+                value={draft.seed}
+                onChange={(event) =>
+                  setDraft({ ...draft, seed: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label htmlFor="momentum">
+              angular momentum{" "}
+              <output>{draft.angularMomentum.toFixed(2)}</output>
+            </label>
+            <input
+              id="momentum"
+              type="range"
+              min="0.4"
+              max="1.35"
+              step="0.01"
+              value={draft.angularMomentum}
+              onChange={(event) =>
+                setDraft({
+                  ...draft,
+                  angularMomentum: Number(event.target.value),
+                })
+              }
+            />
+            <label htmlFor="dispersion">
+              dispersion <output>{draft.dispersion.toFixed(3)}</output>
+            </label>
+            <input
+              id="dispersion"
+              type="range"
+              min="0"
+              max="0.15"
+              step="0.001"
+              value={draft.dispersion}
+              onChange={(event) =>
+                setDraft({ ...draft, dispersion: Number(event.target.value) })
+              }
+            />
+            <label htmlFor="receptivity">
+              tidal drive <output>{draft.receptivity.toFixed(2)}</output>
+            </label>
+            <input
+              id="receptivity"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={draft.receptivity}
+              onChange={(event) =>
+                setDraft({ ...draft, receptivity: Number(event.target.value) })
+              }
+            />
+            <button className="apply" type="submit">
+              apply + restart ↗
+            </button>
+          </form>
+          <div className="observer">
+            <span>the observer / live</span>
+            <label htmlFor="exposure">
+              exposure <output>{view.exposure.toFixed(2)}</output>
+            </label>
+            <input
+              id="exposure"
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.01"
+              value={view.exposure}
+              onChange={(event) =>
+                setView({ ...view, exposure: Number(event.target.value) })
+              }
+            />
+            <label htmlFor="extent">
+              field of view <output>{view.extent.toFixed(1)}</output>
+            </label>
+            <input
+              id="extent"
+              type="range"
+              min="2"
+              max="7"
+              step="0.1"
+              value={view.extent}
+              onChange={(event) =>
+                setView({ ...view, extent: Number(event.target.value) })
+              }
+            />
+            <label htmlFor="trace">
+              trace window <output>{view.traceSeconds.toFixed(1)}s</output>
+            </label>
+            <input
+              id="trace"
+              type="range"
+              min="0.5"
+              max="8"
+              step="0.5"
+              value={view.traceSeconds}
+              onChange={(event) =>
+                setView({ ...view, traceSeconds: Number(event.target.value) })
+              }
+            />
+          </div>
+          <p>
+            softened newtonian test particles. the rupture is an authored
+            projection, not gravitational lensing.
+          </p>
+        </aside>
+      )}
+
+      <YouTubeMini videoId={videoId} onVideoIdChange={setVideoId} />
+      {entered && error && (
         <p className="error" role="alert">
           {error}
         </p>

@@ -1,32 +1,30 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { parseYouTubeId } from "./core/youtube.ts";
 
-function videoId(value: string): string | null {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
-    const host = url.hostname.toLowerCase();
-    const id =
-      host === "youtu.be"
-        ? url.pathname.slice(1)
-        : ["youtube.com", "www.youtube.com", "m.youtube.com"].includes(host)
-          ? url.pathname === "/watch"
-            ? url.searchParams.get("v")
-            : url.pathname.match(/^\/(?:embed|shorts)\/([^/]+)$/)?.[1]
-          : null;
-    return id && /^[\w-]{11}$/.test(id) ? id : null;
-  } catch {
-    return null;
-  }
+interface Props {
+  videoId: string | null;
+  onVideoIdChange: (id: string) => void;
 }
 
-export function YouTubeMini() {
+function clampPosition(x: number, y: number, element: HTMLElement | null) {
+  const box = element?.getBoundingClientRect();
+  const width = box?.width ?? 340;
+  const height = box?.height ?? 80;
+  return {
+    x: Math.max(12, Math.min(window.innerWidth - width - 12, x)),
+    y: Math.max(12, Math.min(window.innerHeight - height - 12, y)),
+  };
+}
+
+export function YouTubeMini({ videoId, onVideoIdChange }: Props) {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [input, setInput] = useState("");
-  const [id, setId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [position, setPosition] = useState<{ x: number; y: number } | null>(
     null,
   );
+  const sectionRef = useRef<HTMLElement>(null);
   const drag = useRef<{
     x: number;
     y: number;
@@ -34,42 +32,81 @@ export function YouTubeMini() {
     top: number;
   } | null>(null);
 
+  useEffect(() => {
+    if (videoId) {
+      setOpen(true);
+      setEditing(false);
+    }
+  }, [videoId]);
+
+  useEffect(() => {
+    const keepVisible = () => {
+      setPosition((current) =>
+        current
+          ? clampPosition(current.x, current.y, sectionRef.current)
+          : null,
+      );
+    };
+    window.addEventListener("resize", keepVisible);
+    return () => window.removeEventListener("resize", keepVisible);
+  }, []);
+
   const load = (event: React.FormEvent) => {
     event.preventDefault();
-    const parsed = videoId(input.trim());
+    const parsed = parseYouTubeId(input.trim());
     if (!parsed) {
-      setError("paste a YouTube video link.");
+      setError("use a youtube video link.");
       return;
     }
     setError("");
-    setId(parsed);
+    onVideoIdChange(parsed);
+    setEditing(false);
     setOpen(true);
   };
-  const move = (event: React.PointerEvent) => {
-    if (!drag.current || event.pointerType === "touch") return;
-    const width = Math.min(340, window.innerWidth - 24);
-    const x = Math.min(
-      window.innerWidth - width - 12,
-      Math.max(12, drag.current.left + event.clientX - drag.current.x),
-    );
-    const y = Math.min(
-      window.innerHeight - 260,
-      Math.max(12, drag.current.top + event.clientY - drag.current.y),
-    );
-    setPosition({ x, y });
-  };
+
   return (
     <section
+      ref={sectionRef}
       className={`youtube-mini ${open ? "is-open" : ""}`}
       style={
         position
           ? { left: position.x, top: position.y, right: "auto", bottom: "auto" }
           : undefined
       }
-      aria-label="YouTube listening companion"
+      aria-label="YouTube companion"
     >
       <div
         className="mini-head"
+        tabIndex={0}
+        role="group"
+        aria-label="YouTube player. Drag to move, or use arrow keys while focused."
+        onKeyDown={(event) => {
+          if (
+            !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
+              event.key,
+            )
+          )
+            return;
+          event.preventDefault();
+          const box = sectionRef.current?.getBoundingClientRect();
+          if (!box) return;
+          const distance = event.shiftKey ? 40 : 10;
+          const x =
+            box.left +
+            (event.key === "ArrowRight"
+              ? distance
+              : event.key === "ArrowLeft"
+                ? -distance
+                : 0);
+          const y =
+            box.top +
+            (event.key === "ArrowDown"
+              ? distance
+              : event.key === "ArrowUp"
+                ? -distance
+                : 0);
+          setPosition(clampPosition(x, y, sectionRef.current));
+        }}
         onPointerDown={(event) => {
           if (
             event.pointerType === "touch" ||
@@ -77,8 +114,7 @@ export function YouTubeMini() {
             event.target.closest("button")
           )
             return;
-          const box =
-            event.currentTarget.parentElement!.getBoundingClientRect();
+          const box = sectionRef.current!.getBoundingClientRect();
           drag.current = {
             x: event.clientX,
             y: event.clientY,
@@ -87,26 +123,43 @@ export function YouTubeMini() {
           };
           event.currentTarget.setPointerCapture(event.pointerId);
         }}
-        onPointerMove={move}
+        onPointerMove={(event) => {
+          if (!drag.current) return;
+          setPosition(
+            clampPosition(
+              drag.current.left + event.clientX - drag.current.x,
+              drag.current.top + event.clientY - drag.current.y,
+              sectionRef.current,
+            ),
+          );
+        }}
         onPointerUp={() => {
+          drag.current = null;
+        }}
+        onPointerCancel={() => {
           drag.current = null;
         }}
       >
         <span>
-          listening room <i>↗</i>
+          youtube <i>↗</i>
         </span>
         <div>
-          <button
-            type="button"
-            onClick={() => setPosition(null)}
-            title="reset player position"
-          >
-            reset
-          </button>
+          {position && (
+            <button
+              type="button"
+              onClick={() => setPosition(null)}
+              title="reset player position"
+            >
+              reset
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setOpen(!open)}
             aria-expanded={open}
+            aria-label={
+              open ? "collapse YouTube player" : "expand YouTube player"
+            }
           >
             {open ? "−" : "+"}
           </button>
@@ -114,42 +167,45 @@ export function YouTubeMini() {
       </div>
       {open && (
         <div className="mini-body">
-          <form onSubmit={load}>
-            <label htmlFor="youtube-url">youtube link</label>
-            <div className="mini-input">
-              <input
-                id="youtube-url"
-                type="url"
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="paste a video link"
-              />
-              <button type="submit">load</button>
-            </div>
-          </form>
-          {error && <p role="alert">{error}</p>}
-          {id && (
+          {videoId && !editing ? (
             <>
               <iframe
                 title="YouTube companion player"
-                src={`https://www.youtube.com/embed/${id}?playsinline=1&origin=${encodeURIComponent(window.location.origin)}`}
+                src={`https://www.youtube.com/embed/${videoId}?playsinline=1&origin=${encodeURIComponent(window.location.origin)}`}
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
               />
-              <a
-                href={`https://www.youtube.com/watch?v=${id}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                open on youtube ↗
-              </a>
+              <div className="mini-actions">
+                <button type="button" onClick={() => setEditing(true)}>
+                  change link
+                </button>
+                <a
+                  href={`https://www.youtube.com/watch?v=${videoId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  open on youtube ↗
+                </a>
+              </div>
             </>
+          ) : (
+            <form onSubmit={load}>
+              <label htmlFor="youtube-url">youtube video link</label>
+              <div className="mini-input">
+                <input
+                  id="youtube-url"
+                  type="url"
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  placeholder="paste a link"
+                  autoComplete="off"
+                />
+                <button type="submit">load ↗</button>
+              </div>
+              {error && <p role="alert">{error}</p>}
+            </form>
           )}
-          <p className="mini-note">
-            youtube plays beside the study. choose a local audio file to let
-            music move the world.
-          </p>
         </div>
       )}
     </section>

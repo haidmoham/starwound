@@ -1,56 +1,33 @@
 # Starwound
 
-**Life, expressed through scientific models and music.**
+An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. Its trajectories pass through an authored field of projected light, rupture, and debris.
 
-A browser-based generative-art instrument. Music changes the conditions of a simulated world; the world evolves under its own rules; an authored observer makes its history visible.
+The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
 
-Inspired by *Nabokov* by Fontaines D.C. and *Interstellar*. These are artistic references, not bundled assets or claims of affiliation.
+## Experience
 
-## Invariant
+The opening presents one framed study in a quiet gallery space. Entering expands that same running world to the viewport. The `fall`, `shear`, and `eject` studies change initial conditions and restart the world. Freeze, restart, still export, and a small tuning sheet remain available. The YouTube dock accepts watch, short, live, embed, and `youtu.be` links; a video can forbid embedding, in which case the dock offers an ordinary YouTube link.
 
-Science + generative processes + music. Physics, biology, chemistry, typography, and visual treatment are variables, not a commitment to one universal simulator. The thesis is life, not a spectrum analyzer.
-
-## Stack
-
-Matches the neighboring `haidmoham/seaglass` frontend: React, TypeScript, Vite, Three.js, plain CSS, npm, Oxlint, and Node/tsx tests. Vercel-compatible static output. No backend, credentials, paid services, or music-platform integration are required.
+The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. The tilted incandescent annulus and black center are authored presentation. They are not general relativity, an accretion simulation, or gravitational lensing. The drawn rupture evolves slowly; freeze stops both the world and that presentation motion.
 
 ## Development
 
-Use Node 22.12+ (22.x recommended).
+React, TypeScript, Vite, Three.js, plain CSS, and npm. No backend, credentials, media upload, or paid service is required.
 
 ```sh
-npm install
+npm ci
 npm run dev
-npm run typecheck
-npm run lint
-npm test
+npm run check
 npm run build
 ```
 
-`npm run preview` serves the production build. Use `npm ci` for a clean install from the checked-in lockfile.
+WebGL draws the trajectories when available; Canvas 2D is the fallback. Both use the same projected geometry. The artwork respects reduced motion and pauses when the tab is hidden. The `starwound.x.dev` shorthand means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
 
-## V1 experience
+## Project notes
 
-Open the study and watch the named synthetic preview, or choose a local audio file. The file stays in the browser. The app decodes it into 50 ms RMS energy and positive energy-change windows; those measurements alter a bounded external drive in the orbital model. Playback time is the simulation authority. Seeking is intentionally unavailable until state restoration exists. Pause, restart, file replacement, hidden-tab pause, and end-of-track silence are supported.
+- [AGENTS.md](AGENTS.md): current operating contract.
+- [docs/brief.md](docs/brief.md): art direction and source transformations.
+- [docs/architecture.md](docs/architecture.md): model and rendering boundaries.
+- [docs/verification.md](docs/verification.md): observed checks and release evidence.
 
-Three model presets offer different initial motion. The instrument exposes seed, momentum, dispersion, receptivity, and observer controls. A still export captures the visible renderer. The YouTube miniplayer accepts a video link as a separate listening companion. Its audio does not drive the model because YouTube embeds do not expose decoded samples to this page.
-
-The site uses Canvas 2D when WebGL is unavailable. `starwound.x.dev` means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
-
-## Scaffold history
-
-The initial scaffold provided an orbital study driven by an explicitly labeled **synthetic fixture**, seeded state, a fixed simulation timestep, bounded trajectory history, controls, a Three.js renderer, and model tests.
-
-Preset import/export, full checkpoints, and scientific validation beyond the seed model remain future work. Do not mistake synthetic forcing for analysis of *Nabokov*.
-
-The seed model is softened Newtonian test-particle motion around one fixed attractor with a localized external drive. It is not general relativity, a self-gravitating N-body model, an accretion fluid, or gravitational lensing. Trail history is a rendering record, not a field that exerts forces.
-
-## Read first
-
-- [`AGENTS.md`](AGENTS.md): operating contract for coding agents.
-- [`docs/brief.md`](docs/brief.md): thesis, aesthetic direction, and scope.
-- [`docs/architecture.md`](docs/architecture.md): implemented boundaries and extension points.
-- [`docs/prior-art.md`](docs/prior-art.md): starting references and reuse cautions.
-- [`docs/verification.md`](docs/verification.md): what was actually checked.
-
-No commercial recording, movie footage, paid font, or third-party implementation is included. Source links are references, not permission to copy their contents.
+The first release explored local audio forcing. The owner's later direction explicitly removed audio reactivity. Historical checks remain in the verification ledger; the current experience has no local audio ingestion. No commercial recording, film footage, paid font, or third-party artwork is bundled.

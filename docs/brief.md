@@ -1,50 +1,29 @@
 # Artistic brief
 
-## Thesis: life
+## Current direction
 
-The original impulse was to move beyond visualizers into software that generates an artwork from music. *Nabokov* by Fontaines D.C. prompted the idea of accumulation, history, and consequences. The thesis then widened from memory to **life**. Biology is one expression; physics is another. *Interstellar* adds time, separation, trajectories, observation, and delayed consequences.
+Starwound should feel like an art installation in someone's browser. Its subject is interstellar physics and autonomous generative behavior. It is explicitly not a visualizer: a YouTube video, expected but not required to be a song, sits beside the work and never affects its state.
 
-Invariant: **scientific model + autonomous generative behavior + music**.
+The entrance takes an optional YouTube link. A framed, already-living artwork sits in a quiet gallery space. Entering carries the same world into a full-viewport field; the scene does not restart. Controls recede to the edges. A compact listening dock can move without taking over the work. The piece must remain complete in silence.
 
-A recording supplies conditions and events. A world encounters them. The resulting image should reveal what the world has lived through, rather than merely display the current audio feature vector.
+## Visual thesis
 
-## First direction, not a permanent restriction
+A tidal rupture: a tilted incandescent annulus, a hard black center, asymmetric red ejecta, needle-white ballistic trajectories, and sparse cold stars. Violence comes from shear, scale, accumulated paths, and escaping matter. Keep black gaps. Avoid constant flashes, uniform bloom, random shake, or generic nebula wallpaper. The brightest marks should have a place and a duration.
 
-Start with a small orbital instrument. Music should eventually influence a bounded external drive or the initial conditions of injected matter. Hold the underlying physical model stable enough to understand the effects. Keep scientific mechanisms distinct from authored musical interpretations.
+The orbital paths are modeled. The illuminated ring and ejecta are authored presentation around that model, not a claim of general relativity or a physically simulated black hole. Use precise labels when a scientific approximation matters.
 
-Current code is a seeded orbital scaffold with synthetic forcing, not a completed audio artwork. Its one-attractor model is an inexpensive place to establish state, integration, histories, and controls. It does not implement relativity, biology, or literal tidal evolution of an extended body.
+## Source transformations
 
-Possible later studies:
+- `haidmoham/seaglass`: framed-to-immersive stage, oversized entrance action, compact controls, and movable media dock. Adapt the interaction hierarchy; do not copy its weather subject or audio-driven scene.
+- `wintery.shin86.dev`: a quiet gallery, substantial frame, small placard, and sparse navigation around a dominant artwork. Adapt the presentation to an autonomous dark field rather than a set of borrowed images.
+- The implementation keeps controls spatially stable on mobile and concentrates the strongest color and motion at the rupture.
 
-- Orbital ribbons, resonant structures, and escaping material.
-- Driven wave fields with propagation and slow relaxation.
-- Two emitters accumulating different proper times, with signal delay modeled separately.
-- Delayed observation and lensing under an explicitly selected physical model.
-- Chemotaxis, reaction-diffusion, cellular growth, or artificial life.
+## Review questions
 
-Do not implement all these now or force them into one universal solver. Preserve the boundaries that make a second study cheap.
+- Does the art read as an installation before any link is supplied?
+- Does entry preserve the running world and the selected video?
+- Do the motion and the scene remain compelling with no media playing?
+- At 390 px, are the artwork, exit, controls, and dock reachable without collision?
+- Do `fall`, `shear`, and `eject` yield different trajectories under the same deterministic rules?
 
-## Art direction
-
-Black as space, not a background for an analytics dashboard. Fine structure, restrained contrast, few colors, negative space, typography used deliberately. Technical excellence should resemble play. A chorus need not produce more particles; an intense passage can produce order, restraint, or a change in behavior.
-
-Avoid generic neon galaxy templates, decorative spectrum rings, unbounded bloom, beat-sized particles, and a fake black hole made from a current-frame distortion. Reference the emotional use of time in *Interstellar*, not just its recognizable imagery.
-
-The scaffold's title/copy/controls are temporary authoring furniture. The finished work should have an exhibition mode in which the art, not the control panel, dominates.
-
-## Optimize for usable knobs
-
-Explore several recognizable behavior regimes from one model. Expose bounded physical parameters, authored macro-controls, and independent observer/rendering settings. Keep known interesting configurations and an audition workflow instead of maximizing slider count.
-
-In the seed model:
-
-- Angular momentum and dispersion alter initial conditions.
-- Receptivity scales an external localized drive.
-- Seed changes the specimen within the same rules.
-- Exposure, view extent, and displayed trace duration alter observation only.
-
-Later candidates include drive timescale, forcing location, injection geometry, damping/relaxation, travel delay, camera trajectory, and memory. Add only knobs with demonstrable effects.
-
-## Evaluation
-
-Compare real forcing with silence/constant input and time-shuffled forcing under the same seed. Revisit the same passage after different histories. Ask whether the result is compositionally distinct, not merely brighter. Keep one local recording and a few authored cues as the first artistic test; robust automatic song understanding is not a prerequisite.
+The initial brief proposed music-conditioned simulation. The owner superseded that direction with the explicit non-visualizer instruction. The old brief survives in Git history.
