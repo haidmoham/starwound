@@ -10,3 +10,6 @@ local-audio/
 !.env.example
 .DS_Store
 *.tsbuildinfo
+.vercel
+.env*
+!.env.example

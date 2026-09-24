@@ -9,6 +9,13 @@
 - Uploaded a generated four-second WAV fixture. The UI changed to `your recording`; playback time advanced to 2.58 s, and restart paused audio at 0 s. The YouTube dock opened at 390 px; playback of an external video was not verified.
 - The browser pass does not establish performance or appearance on a physical phone or a hardware WebGL browser. No commercial recording was tested.
 
+## Hosted release — 2026-09-24
+
+- Vercel project `zarnab/starwound` is connected to `haidmoham/starwound` with `main` as the production branch and repository-owned `vercel.json` build/routing configuration.
+- PR #2 passed GitHub Checks and Vercel preview checks. Merge commit `3170cad` triggered a separate production deployment, `starwound-4zhr5uu35-zarnab.vercel.app`, which reached Ready. GitHub Actions run `36041315634` passed.
+- `https://starwound.vercel.app/` returned HTTP 200 and its HTML SHA-256 matched local `dist/index.html` before the main-push deployment. Repeat asset parity against the final production deployment and both custom hosts after DNS activation.
+- `starwound.shin86.dev` and `starwound.mhaider.dev` are attached to the project. Vercel requested DNS-only `CNAME starwound → 6891e8c0e292e643.vercel-dns-017.com.` in each Cloudflare zone. DNS, TLS, and browser verification remain pending.
+
 ## Initial setup — 2026-09-24
 
 ### Hosted CI: passed
