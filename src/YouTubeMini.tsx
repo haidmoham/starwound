@@ -165,10 +165,10 @@ export function YouTubeMini({ videoId, onVideoIdChange }: Props) {
           </button>
         </div>
       </div>
-      {open && (
-        <div className="mini-body">
-          {videoId && !editing ? (
-            <>
+      {(open || videoId) && (
+        <div className="mini-body" hidden={!open}>
+          {videoId && (
+            <div hidden={editing}>
               <iframe
                 title="YouTube companion player"
                 src={`https://www.youtube.com/embed/${videoId}?playsinline=1&origin=${encodeURIComponent(window.location.origin)}`}
@@ -188,8 +188,9 @@ export function YouTubeMini({ videoId, onVideoIdChange }: Props) {
                   open on youtube ↗
                 </a>
               </div>
-            </>
-          ) : (
+            </div>
+          )}
+          {(editing || !videoId) && (
             <form onSubmit={load}>
               <label htmlFor="youtube-url">youtube video link</label>
               <div className="mini-input">
@@ -203,6 +204,15 @@ export function YouTubeMini({ videoId, onVideoIdChange }: Props) {
                 />
                 <button type="submit">load ↗</button>
               </div>
+              {videoId && (
+                <button
+                  className="mini-cancel"
+                  type="button"
+                  onClick={() => setEditing(false)}
+                >
+                  keep current video
+                </button>
+              )}
               {error && <p role="alert">{error}</p>}
             </form>
           )}

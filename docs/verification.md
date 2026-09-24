@@ -2,6 +2,7 @@
 
 ## Tidal installation revision — 2026-09-24, local
 
+- Follow-up: after starting an embedded video, collapsing and reopening the dock kept the same iframe DOM node mounted. This guards against restarting the embed on collapse. Playback continuity of its audio was not directly measured.
 - `npm run check` passed: TypeScript, Oxlint, and 13 tests. Two new tests cover common YouTube URL forms and rejection of unrelated or malformed URLs. `npm run build` passed with Vite's existing large-chunk warning; `git diff --check` passed.
 - Browser screenshots were inspected at 1440 × 900 and 390 × 844. The framed stage, full-field view, and tuning sheet rendered without horizontal overflow at 390 px. This browser used Canvas 2D fallback because WebGL was unavailable; hardware WebGL and a physical phone remain unverified.
 - An empty link entered the work. An unrelated URL stayed at the entrance with a validation message. A nonmusic YouTube video loaded in the dock and its embedded Play control worked. A video that forbade embedding showed YouTube's unavailable state; the dock retained its `open on youtube` fallback link.

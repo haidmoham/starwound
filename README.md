@@ -2,7 +2,7 @@
 
 An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. Its trajectories pass through an authored field of projected light, rupture, and debris.
 
-The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
+The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. Collapsing the dock keeps its iframe mounted. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
 
 ## Experience
 

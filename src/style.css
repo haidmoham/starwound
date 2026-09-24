@@ -536,6 +536,10 @@ a {
 .mini-body {
   padding: 0 10px 11px;
 }
+.mini-body[hidden],
+.mini-body [hidden] {
+  display: none;
+}
 .mini-body iframe {
   display: block;
   width: 100%;
@@ -576,6 +580,18 @@ a {
   margin: 8px 0 0;
   color: #ff8668;
   font-size: 11px;
+}
+.mini-cancel {
+  margin-top: 9px;
+  border: 0;
+  padding: 2px 0;
+  background: none;
+  color: #d1b8a5;
+  font:
+    10px ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
 }
 .mini-actions {
   display: flex;
