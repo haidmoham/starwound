@@ -3,10 +3,11 @@
 ## V1 local pass — 2026-09-24
 
 - `npm install --no-audit --no-fund` generated `package-lock.json`; CI now uses `npm ci`.
-- `npm run check`: TypeScript, Oxlint, and 12 core tests passed.
+- `npm run check`: TypeScript, Oxlint, and 13 core tests passed. The added replay test compares measured forcing with silence, reordered input, and a different prior history.
 - `npm run build`: passed. Vite reported a 766 kB JavaScript chunk warning; this is a size warning, not a build failure.
 - Browser at `http://127.0.0.1:5173/`: inspected 1280×633 and 390×844 screenshots. No horizontal overflow at 390 px. The browser lacked WebGL, so Canvas 2D fallback showed the orbital trajectories.
 - Uploaded a generated four-second WAV fixture. The UI changed to `your recording`; playback time advanced to 2.58 s, and restart paused audio at 0 s. The YouTube dock opened at 390 px; playback of an external video was not verified.
+- At 1280 px, dragging the YouTube dock moved it from `(44, 689)` to `(444, 459)` CSS pixels. Still export produced a 1280 × 800 PNG of the actual orbital canvas.
 - The browser pass does not establish performance or appearance on a physical phone or a hardware WebGL browser. No commercial recording was tested.
 
 ## Hosted release — 2026-09-24
@@ -15,6 +16,7 @@
 - PR #2 passed GitHub Checks and Vercel preview checks. Merge commit `3170cad` triggered a separate production deployment, `starwound-4zhr5uu35-zarnab.vercel.app`, which reached Ready. GitHub Actions run `36041315634` passed.
 - `https://starwound.vercel.app/` returned HTTP 200 and its HTML SHA-256 matched local `dist/index.html` before the main-push deployment. Repeat asset parity against the final production deployment and both custom hosts after DNS activation.
 - `starwound.shin86.dev` and `starwound.mhaider.dev` are attached to the project. Vercel requested DNS-only `CNAME starwound → 6891e8c0e292e643.vercel-dns-017.com.` in each Cloudflare zone. DNS, TLS, and browser verification remain pending.
+- The final CLI production deployment `dpl_3dWgPz13iDErdtQhRBEyKbsceXow` reached Ready. `starwound.vercel.app` returned HTTP 200 with HTML matching local `dist/index.html` by SHA-256. Headers are `no-cache` for `/` and `public, max-age=31536000, immutable` for hashed assets. Its 390 px browser layout had no horizontal overflow.
 
 ## Initial setup — 2026-09-24
 
