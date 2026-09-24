@@ -2,11 +2,23 @@
 
 ## Initial setup — 2026-09-24
 
-### Executed successfully
+### Hosted CI: passed
+
+[GitHub Actions run 36030523441](https://github.com/haidmoham/starwound/actions/runs/36030523441) completed successfully on scaffold commit `1b051ea7fcc79df6f69fa99eedcecff91585517b`.
+
+The `check` job and its individual steps were read back through GitHub. These all completed successfully:
+
+- `npm install --no-audit --no-fund`
+- `npm run check` (TypeScript typecheck, Oxlint, and Node/tsx tests)
+- `npm run build` (TypeScript typecheck and Vite production build)
+
+This validates the declared frontend dependency combination and build in the GitHub runner. It does not constitute a browser screenshot, musical evaluation, real-device performance measurement, or deployment. CI's generated lockfile was not committed or uploaded as an artifact; generating and committing the lockfile remains work for Codex.
+
+### Additional checks executed in the setup container
 
 - Eleven core tests via `node --experimental-strip-types --test src/core/orbit.test.ts` on Node v22.16.0.
-- Syntax transpilation of all nine TypeScript/TSX files using the installed TypeScript 5.8.3; this is not a dependency-aware typecheck or build.
-- Strict standalone typecheck of `clock.ts`, `random.ts`, `forcing.ts`, and `orbit.ts` using the environment's installed TypeScript 5.8.3:
+- Syntax transpilation of all nine TypeScript/TSX files using installed TypeScript 5.8.3.
+- Strict standalone typecheck of the four pure core modules:
 
 ```sh
 tsc --noEmit --strict --target ES2022 --module ESNext \
@@ -16,15 +28,18 @@ tsc --noEmit --strict --target ES2022 --module ESNext \
 
 Tests cover seeded replay, distinct seeds, 30/60 Hz fixed-step equivalence, ongoing motion in silence, consequential forcing, zero coupling, an unforced aggregate-energy drift bound, finite state, bounded history allocation, invalid inputs, and bounded preview catch-up.
 
-### Not verified here
+The published Git blob hashes for the package manifest, simulation, model tests, App, and renderer were compared with the local files and matched.
 
-The container could not resolve `registry.npmjs.org`; package installation could not complete. Consequently:
+### Local environment limitation
 
-- No package lockfile was fabricated or copied from an incompatible project.
-- The checked-in TypeScript 7 / React / Vite / Three.js dependency combination has not been installed here.
-- `npm run check`, `npm test` through tsx, `npm run build`, and Oxlint were not executed with the repository's declared toolchain.
-- React/Three.js integration, browser rendering, accessibility, responsiveness, WebGL cleanup, and real-device performance remain unverified.
-- No actual recording was loaded or evaluated; no audio subsystem exists yet.
-- No deployment or successful hosted CI run is asserted.
+The setup container could not resolve `registry.npmjs.org`; local package-install attempts timed out. No full local frontend install/build is claimed. The separate hosted CI result above supplies the dependency/build verification that the container could not perform.
 
-Codex's first step is dependency resolution, committing `package-lock.json`, switching CI to `npm ci`, running all declared checks, and inspecting the actual browser output. Update this ledger with commands and observed outcomes, not inferred success.
+### Still unverified or not implemented
+
+- Browser rendering, actual art direction, accessibility, responsiveness, WebGL cleanup, and real-device performance.
+- Real audio loading, feature analysis, playback synchronization, and recording-specific evaluation: no audio subsystem exists yet.
+- Committed dependency lockfile and lockfile-based CI (`npm ci`).
+- Preset/checkpoint round trips, complete performance replay, and art-only exports.
+- No Vercel project, deployment, domain, or secrets were created.
+
+Codex should generate and commit `package-lock.json`, switch CI to `npm ci`, reproduce the checks, inspect the actual browser output, and complete issue #1. Record exact commands and observed outcomes as work progresses.
