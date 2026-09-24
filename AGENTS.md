@@ -1,5 +1,7 @@
 # Starwound: agent operating contract
 
+The owner's `starwound.x.dev` shorthand means mirror deployment to `starwound.shin86.dev` and `starwound.mhaider.dev`. Verify each host separately.
+
 Read `README.md`, `docs/brief.md`, `docs/architecture.md`, and the assigned issue before coding.
 
 ## Preserve the actual project

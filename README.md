@@ -27,13 +27,21 @@ npm test
 npm run build
 ```
 
-`npm run preview` serves the production build. Dependency versions follow Seaglass's checked-in manifest; a lockfile must be generated and committed in a registry-enabled environment before changing CI to `npm ci`.
+`npm run preview` serves the production build. Use `npm ci` for a clean install from the checked-in lockfile.
 
-## Scaffold status
+## V1 experience
 
-The initial scaffold provides an orbital study driven by an explicitly labeled **synthetic fixture**, seeded state, a fixed simulation timestep, bounded trajectory history, controls, a Three.js renderer, and model tests. It is not yet the finished music-driven artwork.
+Open the study and watch the named synthetic preview, or choose a local audio file. The file stays in the browser. The app decodes it into 50 ms RMS energy and positive energy-change windows; those measurements alter a bounded external drive in the orbital model. Playback time is the simulation authority. Seeking is intentionally unavailable until state restoration exists. Pause, restart, file replacement, hidden-tab pause, and end-of-track silence are supported.
 
-Actual audio loading/analysis, transport synchronization, reproducible musical auditions, preset/checkpoint export, scientific validation beyond the seed model, and finished art direction belong to the Codex handoff issue. Do not mistake synthetic forcing for analysis of *Nabokov*.
+Three model presets offer different initial motion. The instrument exposes seed, momentum, dispersion, receptivity, and observer controls. A still export captures the visible renderer. The YouTube miniplayer accepts a video link as a separate listening companion. Its audio does not drive the model because YouTube embeds do not expose decoded samples to this page.
+
+The site uses Canvas 2D when WebGL is unavailable. `starwound.x.dev` means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
+
+## Scaffold history
+
+The initial scaffold provided an orbital study driven by an explicitly labeled **synthetic fixture**, seeded state, a fixed simulation timestep, bounded trajectory history, controls, a Three.js renderer, and model tests.
+
+Preset import/export, full checkpoints, and scientific validation beyond the seed model remain future work. Do not mistake synthetic forcing for analysis of *Nabokov*.
 
 The seed model is softened Newtonian test-particle motion around one fixed attractor with a localized external drive. It is not general relativity, a self-gravitating N-body model, an accretion fluid, or gravitational lensing. Trail history is a rendering record, not a field that exerts forces.
 
