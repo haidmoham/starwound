@@ -1,5 +1,13 @@
 # Verification ledger
 
+## Live mirrored domains — 2026-09-24
+
+- Cloudflare has DNS-only `CNAME starwound → 6891e8c0e292e643.vercel-dns-017.com` in both `shin86.dev` and `mhaider.dev`. Each record was confirmed in the Cloudflare DNS table. The authoritative Cloudflare nameserver returned the `mhaider.dev` CNAME; public resolvers returned the `shin86.dev` CNAME and one public resolver returned the new `mhaider.dev` CNAME while caches were still updating.
+- `vercel domains verify` returned `configured_correctly` and `verified: true` for both `starwound.shin86.dev` and `starwound.mhaider.dev`. Vercel certificates were issued separately for the two hosts.
+- HTTPS requests to both hosts returned HTTP 200 with certificate validation enabled. While local DNS caches settled, `curl --resolve` pinned each host to Vercel edge IP `216.198.79.65`; no TLS bypass was used.
+- The HTML SHA-256 on both custom hosts matched local `dist/index.html` (`f88529b0…f0e5`). The JavaScript and CSS asset hashes also matched the built files on both hosts.
+- Both HTTPS URLs loaded in Chrome with the orbital canvas and study controls visible. The listening room opened on `starwound.mhaider.dev`. The earlier 390 px local browser pass and identical hosted assets support the responsive layout; a physical phone and external YouTube playback remain unverified.
+
 ## V1 local pass — 2026-09-24
 
 - `npm install --no-audit --no-fund` generated `package-lock.json`; CI now uses `npm ci`.
