@@ -31,6 +31,14 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const centerX = width * 0.5;
   const centerY = height * 0.5;
   const radius = size * 0.22;
+  // A long held contraction and short release, anchored to the world's clock.
+  // This is authored pressure, not another physical force or a camera shake.
+  const breath = (phase % 13) / 13;
+  const pressure =
+    breath < 0.84
+      ? Math.pow(breath / 0.84, 2)
+      : Math.pow((1 - breath) / 0.16, 3);
+  const opening = scene.shock * 0.24 + pressure * 0.055;
 
   context.fillStyle = "#020203";
   context.fillRect(0, 0, width, height);
@@ -97,7 +105,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     const arc = Math.sin(angle * 3 + phase * 0.08) * radius * 0.05;
     context.strokeStyle =
       index % 9 === 0 ? "#fff0dd" : index % 3 === 0 ? "#d84e42" : "#77333b";
-    context.globalAlpha = (0.05 + next() * 0.24) * coronaAlpha;
+    context.globalAlpha = (0.025 + next() * 0.13) * coronaAlpha;
     context.lineWidth = (index % 9 === 0 ? 1.1 : 0.55) * ratio;
     context.beginPath();
     context.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
@@ -156,44 +164,52 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.fillStyle = ember;
   context.globalAlpha = Math.min(1, 0.62 + scene.shock * 0.38);
   context.beginPath();
-  for (let index = 0; index <= 96; index++) {
-    const angle = (index / 96) * Math.PI * 2;
-    const edge =
-      coreRadius * (1.35 + Math.sin(angle * 13) * 0.045 + next() * 0.09);
-    const x = Math.cos(angle) * edge;
-    const y = Math.sin(angle) * edge;
-    if (index === 0) context.moveTo(x, y);
-    else context.lineTo(x, y);
-  }
-  context.closePath();
+  context.arc(0, 0, coreRadius * 1.42, 0, Math.PI * 2);
   context.fill();
-  // Broken circular filaments remain centered, rather than becoming a decorative fan.
-  for (let ring = 0; ring < 17; ring++) {
-    const ringRadius = coreRadius * (0.43 + ring * 0.12);
+  // The field holds its center. Only the sector attached to the cut strains.
+  // Fixed topology across quality tiers keeps the wound from changing shape.
+  const rings = detail === 0 ? 12 : 17;
+  for (let ring = 0; ring < rings; ring++) {
+    const ringRadius = coreRadius * (0.43 + ring * 0.14);
     context.strokeStyle = ring % 3 === 0 ? "#ffe4c9" : "#9c3938";
-    context.globalAlpha = (0.19 + scene.shock * 0.14) * (1 - ring / 23);
-    context.lineWidth = 0.65 * ratio;
+    context.globalAlpha = (0.23 + scene.shock * 0.15) * (1 - ring / 24);
+    context.lineWidth = (ring % 3 === 0 ? 0.8 : 0.5) * ratio;
     context.beginPath();
-    context.arc(0, 0, ringRadius, 0, Math.PI * 2);
+    for (let point = 0; point <= 120; point++) {
+      const angle = (point / 120) * Math.PI * 2;
+      const alongCut = Math.cos(angle + 0.44);
+      const strain = Math.pow(Math.max(0, -alongCut), 12);
+      const reach =
+        ringRadius * (1 - pressure * 0.018) +
+        coreRadius * strain * (0.16 + opening) * (ring / rings);
+      const x = Math.cos(angle) * reach;
+      const y = Math.sin(angle) * reach;
+      if (point === 0) context.moveTo(x, y);
+      else context.lineTo(x, y);
+    }
     context.stroke();
   }
   context.rotate(-0.44);
   const tear = random(seed ^ 0x75a91c);
   const upper: [number, number][] = [];
   const lower: [number, number][] = [];
-  const teeth = detail === 0 ? 38 : 64;
+  const teeth = 76;
   for (let index = 0; index <= teeth; index++) {
     const t = index / teeth;
-    const x = (t * 2 - 1) * coreRadius * 1.38;
-    const envelope = Math.pow(Math.sin(t * Math.PI), 0.62);
+    const x = (t * 2.95 - 1.83) * coreRadius;
+    // Unequal lips and a broad torn shoulder instead of a serrated lozenge.
+    const envelope = Math.pow(Math.sin(t * Math.PI), 1.1);
+    const shoulder = Math.exp(-Math.pow((t - 0.36) / 0.18, 2));
     const spine =
-      coreRadius * (Math.sin(t * 9.3) * 0.055 + Math.sin(t * 24) * 0.028);
-    const bite =
-      (0.12 + tear() * 0.23 + (index % 9 === 2 ? 0.2 : 0)) * envelope;
+      coreRadius *
+      (Math.sin(t * 7.4) * 0.14 +
+        Math.sin(t * 18 + 0.7) * 0.045 -
+        shoulder * 0.09);
+    const bite = (0.1 + tear() * 0.095 + shoulder * 0.26 + opening) * envelope;
     upper.push([x, spine - coreRadius * bite]);
     lower.push([
-      x + (tear() - 0.5) * coreRadius * 0.05,
-      spine + coreRadius * (0.07 + tear() * 0.15) * envelope,
+      x + (tear() - 0.5) * coreRadius * 0.03,
+      spine + coreRadius * (0.035 + tear() * 0.055 + opening * 0.25) * envelope,
     ]);
   }
   context.fillStyle = "#030305";
@@ -216,13 +232,13 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     context.stroke();
   }
   // Branches, torn islands and dragged ink follow the same shear axis.
-  const fragments = detail === 0 ? 48 : detail === 1 ? 90 : 140;
+  const fragments = detail === 0 ? 24 : detail === 1 ? 42 : 62;
   for (let index = 0; index < fragments; index++) {
     const side = index % 3 === 0 ? 1 : -1;
     const t = tear();
-    const x = (t * 2 - 1) * coreRadius * 1.18;
+    const x = (t * 2.65 - 1.65) * coreRadius;
     const envelope = Math.sin(t * Math.PI);
-    const y = side * coreRadius * (0.13 + tear() * 0.63) * envelope;
+    const y = side * coreRadius * (0.2 + tear() * 0.48 + opening) * envelope;
     const length = coreRadius * (0.035 + tear() * 0.3);
     const breadth = coreRadius * (0.012 + tear() * 0.065);
     context.fillStyle =

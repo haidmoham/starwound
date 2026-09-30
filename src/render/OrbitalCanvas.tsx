@@ -94,6 +94,7 @@ function startCanvasFallback(
         context.stroke();
       }
       context.fillStyle = "#fff5e5";
+      context.globalAlpha = Math.min(1, viewRef.current.exposure + 0.2);
       for (
         let particle = 0;
         particle < parameters.particleCount;
@@ -105,6 +106,7 @@ function startCanvasFallback(
         );
         context.fillRect(x, y, 1.5 * pixelRatio, 1.5 * pixelRatio);
       }
+      context.globalAlpha = 1;
       installation.budget.record(elapsed * 1000, performance.now() - workStart);
       if (profiling && installation.budget.stats !== lastProfile) {
         lastProfile = installation.budget.stats;
