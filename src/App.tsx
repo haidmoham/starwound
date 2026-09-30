@@ -27,7 +27,7 @@ export function App() {
     ...INITIAL_PARAMETERS,
   });
   const [view, setView] = useState<ViewParameters>({
-    exposure: 0.24,
+    exposure: 0.14,
     extent: 3.1,
     traceSeconds: 7,
   });

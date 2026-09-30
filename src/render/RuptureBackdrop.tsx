@@ -196,7 +196,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     context.strokeStyle =
       ring % 5 === 0 ? "#f7d5b4" : ring % 3 === 0 ? "#ba554b" : "#71383e";
     context.globalAlpha =
-      0.08 + (ring % 5 === 0 ? 0.07 : 0) + scene.shock * 0.09;
+      0.17 + (ring % 5 === 0 ? 0.08 : 0) + scene.shock * 0.1;
     context.lineWidth = 0.55 * ratio;
     context.beginPath();
     for (let point = 0; point <= 84; point++) {
@@ -207,7 +207,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     context.stroke();
     // Unequal luminous passages make the tangled planes readable in motion.
     context.strokeStyle = ring % 4 === 0 ? "#ffe4c5" : "#d55d50";
-    context.globalAlpha = 0.18 + scene.shock * 0.16;
+    context.globalAlpha = 0.3 + scene.shock * 0.2;
     context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
     context.beginPath();
     for (let point = 0; point <= 18; point++) {
