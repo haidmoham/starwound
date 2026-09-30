@@ -1,5 +1,13 @@
 # Verification ledger
 
+## Windows release gate - 2026-09-30
+
+- Reviewed PR #9 at `f6f7d060e2975bd909984b8649be74a49d98b9e8` in an isolated Windows checkout. `npm ci`, `npm run check` (TypeScript, Oxlint, 18 tests), and `npm run build` passed. The existing large-chunk warning remains.
+- A single local Playwright worker using installed Chrome inspected 390 x 844 rendering and the open tuning sheet. The document width was exactly 390 px; all seven opening buttons were inside the viewport, with 44 px heights. Screenshots showed the wounded star, trajectories, distant light, and reachable controls without collision.
+- Clicking `take a still` completed a real `starwound-1997.png` download. The 390 x 844 PNG was opened and visually inspected: it contains both the authored wounded star and modeled trajectories, without controls.
+- Chrome used Canvas 2D fallback and reported no page errors. Hardware WebGL and context-loss recovery remain unverified. Headless desktop timing does not establish physical-phone performance; average-phone and iPhone 17 Pro performance remain unmeasured.
+- Release artifacts (screenshots, PNG, browser observations, and smoke script) were retained outside the repository in the task's `browser-qa` directory.
+
 ## Direct-opening wounded-star revision — 2026-09-30, local branch
 
 - Removed the entry step and media companion. The page now mounts the full-field installation immediately with an authored damaged star and a distant light, while preserving the seeded orbital study and departure-driven flare.
