@@ -204,7 +204,8 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
       coreRadius *
       (Math.sin(t * 7.4) * 0.14 +
         Math.sin(t * 18 + 0.7) * 0.045 -
-        shoulder * 0.09);
+        shoulder * 0.09 +
+        envelope * 0.24);
     const bite = (0.1 + tear() * 0.095 + shoulder * 0.26 + opening) * envelope;
     upper.push([x, spine - coreRadius * bite]);
     lower.push([
