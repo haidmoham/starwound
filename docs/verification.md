@@ -4,7 +4,10 @@
 
 - Removed the entry step and media companion. The page now mounts the full-field installation immediately with an authored damaged star and a distant light, while preserving the seeded orbital study and departure-driven flare.
 - `npm run check` passed TypeScript, Oxlint, and 18 remaining core tests after the obsolete YouTube parser tests were removed. `npm run build` passed with Vite's existing large-chunk warning; `git diff --check` passed.
-- This latest visual composition has not yet been reviewed in a browser or on a physical device. The earlier browser and frame-time observations below describe the previous near-void review revision, not this direct-opening revision. Hardware WebGL, an average phone, and an iPhone 17 Pro remain unverified. Do not infer visual quality or device smoothness from the successful build.
+- Vercel deployed GitHub commit `338de56f07c8f8ef6072f96e176d8bf76e806497` from the review branch to `https://starwound-g60eu3cs7-zarnab.vercel.app/` with state Ready. The production branch and custom domains were not changed.
+- The exact-commit preview was inspected in the cloud browser. It opened directly on the wounded star and distant point, with no Enter or media UI. The fall and eject studies showed materially different trajectories; selecting eject restarted on its initial image. Restart returned to the opening image. Freeze held the visible composition unchanged across two screenshots separated by more than six seconds. The tuning sheet opened with model and observer controls.
+- This browser used Canvas 2D fallback because WebGL was unavailable. One 120-frame high-detail sample at full-field size reported mean 16.80 ms, p90 16.7 ms, p99 16.8 ms, maximum 33.3 ms, and p95 main-thread drawing work 2.6 ms. An eject-study sample reported mean 16.94 ms, p99 33.2 ms, maximum 33.3 ms, and p95 drawing work 2.7 ms. These are cloud-browser observations, not average-phone or iPhone 17 Pro measurements. CPU drawing time is not GPU time.
+- Still export was clicked, but the cloud browser did not deliver a completed download event before its tool timed out. Export output is unverified in this revision. Hardware WebGL, context-loss recovery, narrow viewport, an average phone, and an iPhone 17 Pro remain unverified. Do not infer those from CI or cloud fallback.
 
 ## Seeded rupture review — 2026-09-30
 
