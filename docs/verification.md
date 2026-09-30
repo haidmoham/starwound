@@ -1,5 +1,15 @@
 # Verification ledger
 
+## Chaotic nuclear strands / wound bloom — 2026-09-30
+
+- User refinement replaces the restrained concentric strands with independently tilted, eccentric, precessing authored paths. They share one fixed nucleus and add unequal luminous near-passes, contractions, and outward whips. The original softened-Newtonian trajectories remain separate and quieter; no electron-physics claim is made.
+- `WoundBloom.ts` draws recurved petals and longer stamen-like filaments directly from the changing wound lips. Six staggered cohorts emit short-lived curled ember marks. Randomness is addressed by seed/index/channel, so changing quality does not reshuffle surviving marks. Time derives only from the installation clock, preserving freeze and restart semantics.
+- Bounded low/medium/high budgets: 14/26/40 orbital filaments, 18/30/44 rooted curls, and at most 30/60/96 detached marks evaluated per draw. Lifetimes reduce the concurrently visible detached count. Existing adaptive quality selects the tier; no particle buffers grow over time and no new dependencies are introduced.
+- Local `npm run check` passed TypeScript, Oxlint, and all 18 existing tests. `npm run build` and `git diff --check` passed. No new automated tests were added. Build asset `index-FL7565st.js` was observed in the deployed preview; final JavaScript was 772.48 kB / gzip 208.30 kB, with the existing Vite large-chunk warning.
+- Cloud Chrome visually inspected the opening and later disturbance at 1180 × 757, then the opening and changing strands at 400 × 606 CSS pixels via normal window resize/zoom. The wound stays legible, curls remain attached to its lips, crossing planes share its center, and the distant cold point remains isolated. Narrow layout has no horizontal overflow. Restart returned the complete visual field to its opening.
+- The cloud renderer is Canvas 2D because WebGL is disabled. This is not hardware WebGL, physical-phone, iPhone 17 Pro, or 8 GB Mac verification. No new device-performance claim is made. Full reference provenance and the video-loading limitation are recorded in `docs/brief.md`.
+- Preview only; PR #9 remains draft and main/production mirrors remain held for visual review.
+
 ## Held pressure / asymmetric rupture review — 2026-09-30
 
 - Art-only revision on PR #9: remove the scalloped core boundary; replace the evenly toothed cut with unequal lips, a broad torn shoulder, and a long taper through the luminous center. A 13-second authored envelope holds contraction for 84% of the cycle, then releases. Concentric filaments stay anchored at the canvas center; their cut-facing sector strains with the same envelope. This is presentation, not a change to the physical model.
