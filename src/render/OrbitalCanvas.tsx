@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { FIXED_DT, FixedClock } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
 import { HISTORY_CAPACITY, HISTORY_STRIDE } from "../core/orbit.ts";
+import { presentationScene } from "../media/soundtrackScore.ts";
+import type { SoundtrackClock } from "../media/soundtrackScore.ts";
 
 // Canvas has a downward y axis, so this is the opposite sign of the backdrop's rotation.
 const PROJECTION_ANGLE = 0.33;
@@ -18,6 +20,7 @@ export interface ViewParameters {
 
 interface Props {
   installation: Installation;
+  soundtrack: SoundtrackClock;
   view: Readonly<ViewParameters>;
   paused: boolean;
   onError: (message: string) => void;
@@ -26,6 +29,7 @@ interface Props {
 function startCanvasFallback(
   canvas: HTMLCanvasElement,
   installation: Installation,
+  soundtrack: SoundtrackClock,
   viewRef: React.RefObject<Readonly<ViewParameters>>,
   pausedRef: React.RefObject<boolean>,
 ): () => void {
@@ -45,7 +49,10 @@ function startCanvasFallback(
     if (!document.hidden) {
       if (pausedRef.current) clock.discard();
       else clock.advance(elapsed, () => installation.step());
-      canvas.style.opacity = String(installation.scene().trajectoryOpacity);
+      canvas.style.opacity = String(
+        presentationScene(installation.scene(), soundtrack.readTime())
+          .trajectoryOpacity,
+      );
       const rect = canvas.getBoundingClientRect();
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = Math.max(1, Math.floor(rect.width * pixelRatio));
@@ -126,7 +133,13 @@ function startCanvasFallback(
   return () => cancelAnimationFrame(frame);
 }
 
-export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
+export function OrbitalCanvas({
+  installation,
+  soundtrack,
+  view,
+  paused,
+  onError,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const viewRef = useRef(view);
@@ -159,6 +172,7 @@ export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
       const stop = startCanvasFallback(
         fallback,
         installation,
+        soundtrack,
         viewRef,
         pausedRef,
       );
@@ -254,6 +268,7 @@ export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
       stopFallback = startCanvasFallback(
         fallbackCanvas,
         installation,
+        soundtrack,
         viewRef,
         pausedRef,
       );
@@ -319,7 +334,10 @@ export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
         }
         tipGeometry.getAttribute("position").needsUpdate = true;
         tipGeometry.setDrawRange(0, tipCount);
-        const sceneState = installation.scene();
+        const sceneState = presentationScene(
+          installation.scene(),
+          soundtrack.readTime(),
+        );
         material.opacity = currentView.exposure * sceneState.trajectoryOpacity;
         tipMaterial.opacity =
           Math.min(1, currentView.exposure + 0.2) *
@@ -364,7 +382,7 @@ export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
       renderer.dispose();
       renderer.forceContextLoss();
     };
-  }, [installation, onError]);
+  }, [installation, soundtrack, onError]);
 
   return (
     <canvas

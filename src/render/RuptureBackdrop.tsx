@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { FIXED_DT } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
+import { presentationScene, soundtrackCue } from "../media/soundtrackScore.ts";
+import type { SoundtrackClock } from "../media/soundtrackScore.ts";
 
 function random(seed: number) {
   let state = seed >>> 0;
@@ -11,10 +13,15 @@ function random(seed: number) {
   };
 }
 
-function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
+function drawRupture(
+  canvas: HTMLCanvasElement,
+  installation: Installation,
+  soundtrack: SoundtrackClock,
+) {
   const seed = installation.world.parameters.seed;
-  const phase = installation.world.time;
-  const scene = installation.scene();
+  const mediaTime = soundtrack.readTime();
+  const phase = mediaTime ?? installation.world.time;
+  const scene = presentationScene(installation.scene(), mediaTime);
   const detail = installation.budget.detail;
   const bounds = canvas.getBoundingClientRect();
   const ratio = Math.min(
@@ -35,10 +42,12 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   // A long held contraction and short release, anchored to the world's clock.
   // This is authored pressure, not another physical force or a camera shake.
   const breath = (phase % 13) / 13;
-  const pressure =
+  const autonomousPressure =
     breath < 0.84
       ? Math.pow(breath / 0.84, 2)
       : Math.pow((1 - breath) / 0.16, 3);
+  const pressure =
+    mediaTime === null ? autonomousPressure : soundtrackCue(mediaTime).pressure;
   const opening = scene.shock * 0.24 + pressure * 0.055;
 
   context.fillStyle = "#020203";
@@ -329,7 +338,11 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.globalAlpha = 1;
 
   // Modeled outward crossings leave quiet, bounded scars after the flash.
-  if (scene.ruptureAt !== null && phase >= scene.ruptureAt) {
+  if (
+    mediaTime === null &&
+    scene.ruptureAt !== null &&
+    phase >= scene.ruptureAt
+  ) {
     const scale = size / 6.2;
     const project = (x: number, y: number): [number, number] => {
       const py = y * 0.59;
@@ -378,8 +391,10 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
 
 export function RuptureBackdrop({
   installation,
+  soundtrack,
 }: {
   installation: Installation;
+  soundtrack: SoundtrackClock;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -387,24 +402,29 @@ export function RuptureBackdrop({
     if (!canvas) return;
     let lastDraw = 0;
     let lastTick = -1;
+    let lastMediaTime: number | null = null;
     let lastDetail = -1;
     let frame = 0;
-    const render = () => drawRupture(canvas, installation);
+    const render = () => drawRupture(canvas, installation, soundtrack);
     const observer = new ResizeObserver(render);
     observer.observe(canvas);
     render();
     const animate = (now: number) => {
       const tick = installation.world.ticks;
+      const mediaTime = soundtrack.readTime();
       const detail = installation.budget.detail;
       const fps = detail === 0 ? 10 : detail === 1 ? 16 : 24;
       if (
         !document.hidden &&
-        (tick !== lastTick || detail !== lastDetail) &&
+        (tick !== lastTick ||
+          detail !== lastDetail ||
+          mediaTime !== lastMediaTime) &&
         now - lastDraw > 1000 / fps
       ) {
         render();
         lastDraw = now;
         lastTick = tick;
+        lastMediaTime = mediaTime;
         lastDetail = detail;
       }
       frame = requestAnimationFrame(animate);
@@ -414,7 +434,7 @@ export function RuptureBackdrop({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [installation]);
+  }, [installation, soundtrack]);
   return (
     <canvas className="rupture-backdrop" ref={canvasRef} aria-hidden="true" />
   );

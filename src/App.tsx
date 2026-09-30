@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Installation } from "./core/installation.ts";
 import { DEFAULT_PARAMETERS } from "./core/orbit.ts";
 import type { OrbitParameters } from "./core/orbit.ts";
@@ -6,6 +6,7 @@ import { OrbitalCanvas } from "./render/OrbitalCanvas.tsx";
 import type { ViewParameters } from "./render/OrbitalCanvas.tsx";
 import { RuptureBackdrop } from "./render/RuptureBackdrop.tsx";
 import { LocalSoundtrack } from "./media/LocalSoundtrack.tsx";
+import type { SoundtrackClock } from "./media/soundtrackScore.ts";
 
 const STUDIES = [
   { name: "fall", momentum: 0.66, dispersion: 0.018, receptivity: 0.72 },
@@ -21,6 +22,10 @@ const INITIAL_PARAMETERS: OrbitParameters = {
 };
 
 export function App() {
+  const soundtrack = useMemo<SoundtrackClock>(
+    () => ({ readTime: () => null }),
+    [],
+  );
   const [parameters, setParameters] = useState<OrbitParameters>({
     ...INITIAL_PARAMETERS,
   });
@@ -34,6 +39,20 @@ export function App() {
   });
   const [paused, setPaused] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const pausedRef = useRef(paused);
+  const heldMediaTime = useRef<number | null>(null);
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+  const presentationClock = useMemo<SoundtrackClock>(
+    () => ({
+      readTime: () => {
+        if (!pausedRef.current) heldMediaTime.current = soundtrack.readTime();
+        return heldMediaTime.current;
+      },
+    }),
+    [soundtrack],
   );
   const [showControls, setShowControls] = useState(false);
   const [showSoundtrack, setShowSoundtrack] = useState(false);
@@ -115,10 +134,14 @@ export function App() {
         aria-label="A wounded star in an autonomous orbital field"
       >
         <div className="artwork-frame">
-          <RuptureBackdrop installation={installation} />
+          <RuptureBackdrop
+            installation={installation}
+            soundtrack={presentationClock}
+          />
           <OrbitalCanvas
             installation={installation}
             view={view}
+            soundtrack={presentationClock}
             paused={paused}
             onError={setError}
           />
@@ -200,6 +223,7 @@ export function App() {
       </div>
 
       <LocalSoundtrack
+        clock={soundtrack}
         open={showSoundtrack}
         onClose={() => setShowSoundtrack(false)}
       />
