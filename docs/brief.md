@@ -2,30 +2,30 @@
 
 ## Current direction
 
-Starwound should feel like an art installation in someone's browser. Its subject is interstellar physics and autonomous generative behavior. It is explicitly not a visualizer: a YouTube video, expected but not required to be a song, sits beside the work and never affects its state.
+Starwound should feel like an art installation in someone's browser. Its subject is a wounded star in its dying breath, autonomous matter in flight, and the cosmic longing created by distance. It is explicitly not a visualizer and has no music component.
 
-The entrance takes an optional YouTube link. A framed near-void sits in a quiet gallery space. A few distant points and a barely visible trajectory hint that the world is moving. The first modeled departure brings the wound into view; a short violent phase fades into an altered quiet with persistent marks. Entering carries the same world into a full-viewport field; the scene does not restart. Controls recede to the edges. A compact listening dock can move without taking over the work. The piece must remain complete in silence.
+Open directly in the full field. The damaged star is already present, small enough to leave real darkness around it. A distant cold point and long negative space carry the pain of separation. The first modeled departure intensifies the wound briefly; the forceful phase fades into an altered quiet with persistent marks. Controls recede to the edges. The piece is complete in silence.
 
 ## Visual thesis
 
-A tidal rupture: a tilted incandescent annulus, a hard black center, asymmetric red ejecta, needle-white orbital trajectories, and sparse cold stars. The opening must read as a void, not existing black-hole wallpaper. Violence arrives briefly from a modeled boundary crossing, then recedes. Scar marks persist where subsequent outward crossings occurred. Keep black gaps. Avoid constant flashes, uniform bloom, random shake, or generic nebula wallpaper. The brightest marks should have a place and a duration.
+A wounded ember: pale heat cut by a black fissure, a sparse red corona, asymmetric ejecta, ivory orbital trajectories, a far blue-white point, and black space between them. Violence arrives briefly from a modeled boundary crossing, then recedes. Scar marks persist where subsequent outward crossings occurred. Keep black gaps. Avoid constant flashes, uniform bloom, random shake, generic nebula wallpaper, and black-hole iconography. The brightest marks should have a place and a duration.
 
-The orbital paths are modeled. The illuminated ring and ejecta are authored presentation around that model, not a claim of general relativity or a physically simulated black hole. Use precise labels when a scientific approximation matters.
+The orbital paths are modeled. The star surface, dark wound, distant point, corona, and ejecta are authored presentation around that model, not claims of stellar hydrodynamics or general relativity. Use precise labels when a scientific approximation matters.
 
 ## Source transformations
 
-- `haidmoham/seaglass`: framed-to-immersive stage, oversized entrance action, compact controls, and movable media dock. Adapt the interaction hierarchy; do not copy its weather subject or audio-driven scene.
-- `wintery.shin86.dev`: a quiet gallery, substantial frame, small placard, and sparse navigation around a dominant artwork. Adapt the presentation to an autonomous dark field rather than a set of borrowed images.
-- The implementation keeps controls spatially stable on mobile and concentrates the strongest color and motion at the rupture.
+- _86_: take serious, original inspiration from its emotional restraint, loss, and distance. Do not copy frames, characters, insignia, compositions, audio, or other protected assets.
+- `haidmoham/seaglass`: preserve the useful compact-control discipline, not its entrance or media concept.
+- The implementation keeps controls spatially stable on mobile and concentrates the strongest color and motion at the wound.
 
 ## Review questions
 
-- Does the art read as an installation before any link is supplied?
-- Does entry preserve the running world and the selected video?
-- Do the motion and the scene remain compelling with no media playing?
+- Is the wounded star visible and compelling from the first frame, with no action required?
+- Do the motion and the scene remain compelling in complete silence?
+- Does the space between the star and the far light make distance palpable without explanatory UI?
 - At 390 px, are the artwork, exit, controls, and dock reachable without collision?
 - Do `fall`, `shear`, and `eject` yield different trajectories under the same deterministic rules?
 - Does restart return the entire composition, including backdrop and event marks, to the same opening?
 - Does a quiet first passage make the disturbance consequential, and do the scars remain legible after it fades?
 
-The initial brief proposed music-conditioned simulation. The owner superseded that direction with the explicit non-visualizer instruction. The old brief survives in Git history.
+The initial brief proposed music-conditioned simulation. The owner superseded it with the explicit no-music, direct-opening wounded-star direction. The old brief survives in Git history.

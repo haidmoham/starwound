@@ -22,7 +22,7 @@ These are references, not vendored implementations. Verify licenses, model assum
 
 - [Max Cooper: Emergence](https://maxcooper.net/emergence): science, music, and visual work can remain coherent across different model families.
 - [Andy Lomas: Species Explorer](https://andylomas.com/extra/andylomas_species_explorer_eva2016.pdf): inspiration for selecting and branching among candidate parameter configurations. Start with saved auditions, not a machine-learning search pipeline.
-- *Nabokov* by Fontaines D.C. and *Interstellar* informed the project's first direction. The current installation uses no recording analysis or film assets.
+- _Nabokov_ by Fontaines D.C. and _Interstellar_ informed the project's first direction. The current installation uses no recording analysis or film assets.
 
 ## Implementation references
 
@@ -30,4 +30,4 @@ These are references, not vendored implementations. Verify licenses, model assum
 - [Three.js docs](https://threejs.org/docs/)
 - [Seaglass stack baseline](https://github.com/haidmoham/seaglass/blob/main/package.json)
 
-These references are historical research leads. The current installation uses an autonomous orbital model and an independent YouTube companion; it does not condition the world on music.
+These references are historical research leads. The current installation uses an autonomous orbital model with no music component.

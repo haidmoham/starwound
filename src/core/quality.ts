@@ -12,7 +12,9 @@ export interface FrameStats {
 }
 
 function percentile(sorted: readonly number[], fraction: number): number {
-  return sorted[Math.min(sorted.length - 1, Math.ceil(fraction * sorted.length) - 1)];
+  return sorted[
+    Math.min(sorted.length - 1, Math.ceil(fraction * sorted.length) - 1)
+  ];
 }
 
 /** Changes drawing density only. The simulation and event order never depend on it. */
@@ -39,11 +41,21 @@ export class FrameBudget {
 
     const intervals = this.intervals.sort((a, b) => a - b);
     const work = this.work.sort((a, b) => a - b);
-    const meanMs = intervals.reduce((sum, value) => sum + value, 0) / intervals.length;
+    const meanMs =
+      intervals.reduce((sum, value) => sum + value, 0) / intervals.length;
     const p90Ms = percentile(intervals, 0.9);
     const p99Ms = percentile(intervals, 0.99);
     const workP95Ms = percentile(work, 0.95);
-    this.stats = { meanMs, p90Ms, p99Ms, maxMs: intervals.at(-1) ?? 0, workP95Ms, samples: intervals.length, excludedStalls: this.excludedStalls, detail: this.detail };
+    this.stats = {
+      meanMs,
+      p90Ms,
+      p99Ms,
+      maxMs: intervals.at(-1) ?? 0,
+      workP95Ms,
+      samples: intervals.length,
+      excludedStalls: this.excludedStalls,
+      detail: this.detail,
+    };
     this.intervals = [];
     this.work = [];
     this.excludedStalls = 0;

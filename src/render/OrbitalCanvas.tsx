@@ -94,7 +94,11 @@ function startCanvasFallback(
         context.stroke();
       }
       context.fillStyle = "#fff5e5";
-      for (let particle = 0; particle < parameters.particleCount; particle += particleStride) {
+      for (
+        let particle = 0;
+        particle < parameters.particleCount;
+        particle += particleStride
+      ) {
         const [x, y] = project(
           world.positions[particle * 2],
           world.positions[particle * 2 + 1],
@@ -120,12 +124,7 @@ function startCanvasFallback(
   return () => cancelAnimationFrame(frame);
 }
 
-export function OrbitalCanvas({
-  installation,
-  view,
-  paused,
-  onError,
-}: Props) {
+export function OrbitalCanvas({ installation, view, paused, onError }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const viewRef = useRef(view);
@@ -176,7 +175,9 @@ export function OrbitalCanvas({
     const world = installation.world;
     const parameters = world.parameters;
     const clock = new FixedClock();
-    const profiling = new URLSearchParams(window.location.search).has("profile");
+    const profiling = new URLSearchParams(window.location.search).has(
+      "profile",
+    );
     let lastProfile = installation.budget.stats;
     const maxSegments = parameters.particleCount * (HISTORY_CAPACITY - 1);
     const segmentPositions = new Float32Array(maxSegments * 6);
@@ -248,7 +249,12 @@ export function OrbitalCanvas({
       fallbackCanvas.setAttribute("aria-hidden", "true");
       canvas.after(fallbackCanvas);
       canvas.style.display = "none";
-      stopFallback = startCanvasFallback(fallbackCanvas, installation, viewRef, pausedRef);
+      stopFallback = startCanvasFallback(
+        fallbackCanvas,
+        installation,
+        viewRef,
+        pausedRef,
+      );
       onError("");
     };
     canvas.addEventListener("webglcontextlost", loseContext);
@@ -313,7 +319,9 @@ export function OrbitalCanvas({
         tipGeometry.setDrawRange(0, tipCount);
         const sceneState = installation.scene();
         material.opacity = currentView.exposure * sceneState.trajectoryOpacity;
-        tipMaterial.opacity = Math.min(1, currentView.exposure + 0.2) * sceneState.trajectoryOpacity;
+        tipMaterial.opacity =
+          Math.min(1, currentView.exposure + 0.2) *
+          sceneState.trajectoryOpacity;
         const halfHeight = currentView.extent * Math.max(1, 1 / aspect);
         camera.left = -halfHeight * aspect;
         camera.right = halfHeight * aspect;
@@ -321,7 +329,10 @@ export function OrbitalCanvas({
         camera.bottom = -halfHeight;
         camera.updateProjectionMatrix();
         renderer.render(scene, camera);
-        installation.budget.record(elapsed * 1000, performance.now() - workStart);
+        installation.budget.record(
+          elapsed * 1000,
+          performance.now() - workStart,
+        );
         if (profiling && installation.budget.stats !== lastProfile) {
           lastProfile = installation.budget.stats;
           document.documentElement.dataset.starwoundProfile = JSON.stringify({

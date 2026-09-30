@@ -1,14 +1,14 @@
 # Starwound
 
-An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. It opens from a near-void: modeled outward crossings bring a brief rupture, and sparse marks remain as it settles into a changed quiet.
+An interstellar generative-art installation for the browser. It opens directly on a dying, wounded star, with a distant last point of light across a severe black field. A deterministic softened-Newtonian particle world keeps moving without sound. Modeled outward crossings bring a brief flare; sparse marks remain as the work settles into a changed quiet.
 
-The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. Collapsing the dock keeps its iframe mounted. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
+There is no entry gate or media companion. The work is autonomous generative art, with no music input or reactivity.
 
 ## Experience
 
-The opening presents one framed study in a quiet gallery space. Entering expands that same running world to the viewport. The `fall`, `shear`, and `eject` studies change initial conditions and restart the world. Freeze, restart, still export, and a small tuning sheet remain available. The YouTube dock accepts watch, short, live, embed, and `youtu.be` links; a video can forbid embedding, in which case the dock offers an ordinary YouTube link.
+The full-viewport field is present immediately. The `fall`, `shear`, and `eject` studies change initial conditions and restart the world. Freeze, restart, still export, and a small tuning sheet remain available. A wounded ember is visible from the first frame; a modeled departure drives the temporary violence. The distant point and event scars hold the theme of distance in the quieter passages.
 
-The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. Crossings of a compositional radius are departures, not a claim of gravitational escape. The tilted incandescent annulus and black center are authored presentation. They are not general relativity, an accretion simulation, or gravitational lensing. The drawn rupture and its scars now follow the world's seeded event history; restart replays both together.
+The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. Crossings of a compositional radius are departures, not a claim of gravitational escape. The luminous star, its black wound, its corona, and the far point of light are authored presentation, not simulated plasma or general relativity. The flare and scars follow the world's seeded event history; restart replays both together.
 
 ## Development
 

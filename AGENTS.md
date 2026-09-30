@@ -6,12 +6,12 @@ Read `README.md`, `docs/brief.md`, `docs/architecture.md`, and the assigned issu
 
 ## Preserve the actual project
 
-- The current work is an interstellar physics and generative-art installation. A YouTube link is the optional entrance gesture and playback companion. Video and audio never drive the scene.
+- The current work opens directly on an autonomous, dying wounded star. There is no entry gate, YouTube companion, music input, or audio-reactive behavior.
 - Keep the existing React + TypeScript + Vite + Three.js + plain CSS + npm stack. No framework migration, backend, credentials, paid API, or monorepo without a concrete need.
-- This is an art installation in the browser, not a dashboard, equalizer, visualizer, product landing page, or particle preset gallery. The framed exhibit and full-field view must privilege the artwork over controls.
+- This is an art installation in the browser, not a dashboard, equalizer, visualizer, product landing page, or particle preset gallery. The full-field artwork must privilege the image over controls.
 - The world evolves autonomously through a deterministic model. Playback must stay independent of forcing, simulation time, and rendering. Immediate gestures are allowed when their consequences persist in the world.
 - Scientific approximations must be named. Do not call softened Newtonian motion general relativity, a framebuffer warp gravitational lensing, or fading trails causal memory.
-- Never bundle commercial recordings, movie assets, or paid fonts. Accept only user-selected YouTube links for the companion. Verify licensing before copying third-party code.
+- Take serious but original aesthetic inspiration from the requested _86_ mood: restraint, distance, loss, and red/ivory light against severe darkness. Never copy frames, characters, marks, music, recordings, or paid fonts. Verify licensing before copying third-party code.
 
 ## Engineering
 
@@ -27,6 +27,6 @@ Read `README.md`, `docs/brief.md`, `docs/architecture.md`, and the assigned issu
 
 - Bootstrap: `npm install`, commit the generated lockfile, then use `npm ci` in CI and development verification.
 - Run `npm run check` and `npm run build`. Add a browser smoke test and actually inspect the composition at desktop and narrow widths.
-- Test same seed + same autonomous forcing, silence, and changed initial conditions. Verify that YouTube playback has no connection to the model.
+- Test same seed + same autonomous forcing, silence, and changed initial conditions. Verify that no media subsystem enters the model.
 - Report exactly what ran. Model tests are not browser verification; a successful build is not a visual evaluation. Never invent screenshots or performance figures.
 - Update `docs/verification.md` and the issue with results and remaining blockers.

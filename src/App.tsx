@@ -2,11 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Installation } from "./core/installation.ts";
 import { DEFAULT_PARAMETERS } from "./core/orbit.ts";
 import type { OrbitParameters } from "./core/orbit.ts";
-import { parseYouTubeId } from "./core/youtube.ts";
 import { OrbitalCanvas } from "./render/OrbitalCanvas.tsx";
 import type { ViewParameters } from "./render/OrbitalCanvas.tsx";
 import { RuptureBackdrop } from "./render/RuptureBackdrop.tsx";
-import { YouTubeMini } from "./YouTubeMini.tsx";
 
 const STUDIES = [
   { name: "fall", momentum: 0.66, dispersion: 0.018, receptivity: 0.72 },
@@ -36,10 +34,7 @@ export function App() {
   const [paused, setPaused] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
-  const [entered, setEntered] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [link, setLink] = useState("");
-  const [videoId, setVideoId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
   const [error, setError] = useState("");
   const installation = useMemo(
@@ -59,27 +54,11 @@ export function App() {
     const leave = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setShowControls(false);
-        setEntered(false);
       }
     };
     window.addEventListener("keydown", leave);
     return () => window.removeEventListener("keydown", leave);
   }, []);
-
-  const enter = (event: React.FormEvent) => {
-    event.preventDefault();
-    const value = link.trim();
-    if (value) {
-      const parsed = parseYouTubeId(value);
-      if (!parsed) {
-        setError("use a youtube video link, or leave this empty.");
-        return;
-      }
-      setVideoId(parsed);
-    }
-    setError("");
-    setEntered(true);
-  };
 
   const restart = () => {
     setResetKey((value) => value + 1);
@@ -116,9 +95,7 @@ export function App() {
   };
 
   return (
-    <main
-      className={`gallery ${entered ? "entered" : ""} ${showControls ? "tuning-open" : ""}`}
-    >
+    <main className={`gallery immersive ${showControls ? "tuning-open" : ""}`}>
       <a className="skip-link" href="#field-controls">
         skip to controls
       </a>
@@ -127,12 +104,13 @@ export function App() {
           ← shin86.dev
         </a>
         <span>starwound / 001</span>
-        <button type="button" onClick={() => setEntered(!entered)}>
-          {entered ? "frame ↙" : "full field ↗"}
-        </button>
+        <span>light persists</span>
       </header>
 
-      <section className="exhibit" aria-label="Starwound orbital installation">
+      <section
+        className="exhibit"
+        aria-label="A wounded star in an autonomous orbital field"
+      >
         <div className="artwork-frame">
           <RuptureBackdrop installation={installation} />
           <OrbitalCanvas
@@ -146,44 +124,15 @@ export function App() {
             <span>SW—001</span>
             <span>softened newtonian study</span>
           </div>
-          <div className="art-corner" aria-hidden="true">
-            ✳
-          </div>
         </div>
-        {!entered && (
-          <div className="placard">
-            <div>
-              <span>001 / a study of matter in flight</span>
-              <h1>
-                starwound<span>.</span>
-              </h1>
-            </div>
-            <span className="placard-aside">the field keeps moving.</span>
-          </div>
-        )}
+        <div className="work-title">
+          <span>001 / A STUDY OF MATTER IN FLIGHT</span>
+          <h1>
+            STARWOUND<span>.</span>
+          </h1>
+          <p>the light arrives long after the wound</p>
+        </div>
       </section>
-
-      {!entered && (
-        <form className="entrance" onSubmit={enter}>
-          <label htmlFor="entrance-link">
-            a youtube link <span>/ optional</span>
-          </label>
-          <div className="entrance-line">
-            <input
-              id="entrance-link"
-              type="url"
-              value={link}
-              onChange={(event) => setLink(event.target.value)}
-              placeholder="paste any video link"
-              autoComplete="off"
-            />
-            <button type="submit">
-              enter <span>↗</span>
-            </button>
-          </div>
-          {error && <p role="alert">{error}</p>}
-        </form>
-      )}
 
       <nav className="study-rail" aria-label="Choose orbital study">
         {STUDIES.map((study, index) => (
@@ -372,8 +321,7 @@ export function App() {
         </aside>
       )}
 
-      <YouTubeMini videoId={videoId} onVideoIdChange={setVideoId} />
-      {entered && error && (
+      {error && (
         <p className="error" role="alert">
           {error}
         </p>

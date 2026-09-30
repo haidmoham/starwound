@@ -1,5 +1,11 @@
 # Verification ledger
 
+## Direct-opening wounded-star revision — 2026-09-30, local branch
+
+- Removed the entry step and media companion. The page now mounts the full-field installation immediately with an authored damaged star and a distant light, while preserving the seeded orbital study and departure-driven flare.
+- `npm run check` passed TypeScript, Oxlint, and 18 remaining core tests after the obsolete YouTube parser tests were removed. `npm run build` passed with Vite's existing large-chunk warning; `git diff --check` passed.
+- This latest visual composition has not yet been reviewed in a browser or on a physical device. The earlier browser and frame-time observations below describe the previous near-void review revision, not this direct-opening revision. Hardware WebGL, an average phone, and an iPhone 17 Pro remain unverified. Do not infer visual quality or device smoothness from the successful build.
+
 ## Seeded rupture review — 2026-09-30
 
 - On branch `codex/finish-starwound-installation`, `npm ci --no-audit --no-fund` succeeded with `NPM_CONFIG_CACHE=/tmp/starwound-npm-cache` after this container's default npm cache path failed. `npm run check` passed TypeScript, Oxlint, and 20 tests; `npm run build` passed with Vite's pre-existing large-chunk warning; `git diff --check` passed.

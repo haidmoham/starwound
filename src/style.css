@@ -23,8 +23,7 @@ button {
 }
 button:focus-visible,
 input:focus-visible,
-a:focus-visible,
-.mini-head:focus-visible {
+a:focus-visible {
   outline: 2px solid #de4428;
   outline-offset: 3px;
 }
@@ -156,122 +155,6 @@ a {
   text-transform: uppercase;
   pointer-events: none;
 }
-.art-corner {
-  position: absolute;
-  z-index: 3;
-  top: 15px;
-  right: 18px;
-  color: #e44828;
-  font-size: 18px;
-  pointer-events: none;
-}
-.placard {
-  min-height: 86px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 9px 0;
-}
-.placard > div > span,
-.placard-aside {
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-  letter-spacing: 0.06em;
-}
-.placard h1 {
-  margin: 4px 0 0;
-  font:
-    700 clamp(31px, 4vw, 54px)/0.88 Arial,
-    Helvetica,
-    sans-serif;
-  letter-spacing: -0.075em;
-}
-.placard h1 span {
-  color: #c83c25;
-}
-.placard-aside {
-  align-self: flex-end;
-  padding-bottom: 2px;
-  color: #5e584c;
-}
-.entrance {
-  width: min(1040px, 83vw);
-  margin: 8px auto 0;
-  border-top: 1px solid #403b334f;
-}
-.entrance label {
-  display: block;
-  margin: 13px 0 4px;
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.entrance label span {
-  color: #746e63;
-}
-.entrance-line {
-  display: flex;
-  align-items: end;
-  gap: 18px;
-}
-.entrance input {
-  flex: 1;
-  min-width: 0;
-  height: 46px;
-  padding: 0 4px;
-  border: 0;
-  border-bottom: 1px solid #403b3366;
-  outline-offset: -3px;
-  background: transparent;
-  color: #211f1b;
-  font:
-    16px Georgia,
-    serif;
-}
-.entrance input::placeholder {
-  color: #746e63;
-  font-style: italic;
-}
-.entrance-line button {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 0;
-  padding: 0 2px 0 0;
-  background: none;
-  color: #231f1b;
-  font:
-    900 clamp(32px, 4vw, 57px)/0.85 Impact,
-    "Arial Narrow",
-    sans-serif;
-  letter-spacing: -0.025em;
-  text-transform: uppercase;
-  transition:
-    color 0.2s,
-    transform 0.2s;
-}
-.entrance-line button:hover {
-  color: #c83c25;
-  transform: translateX(4px);
-}
-.entrance-line button span {
-  font:
-    400 25px Arial,
-    sans-serif;
-}
-.entrance > p {
-  margin: 6px 0;
-  color: #a52519;
-  font-size: 12px;
-}
 .study-rail {
   position: relative;
   z-index: 8;
@@ -330,17 +213,17 @@ a {
 .study-rail button:hover {
   color: #b93921;
 }
-.entered {
+.immersive {
   height: 100svh;
   overflow: hidden;
   padding: 0;
   background: #050506;
   color: #f6ebdc;
 }
-.entered::before {
+.immersive::before {
   display: none;
 }
-.entered .gallery-header {
+.immersive .gallery-header {
   position: fixed;
   top: 0;
   left: 22px;
@@ -348,11 +231,11 @@ a {
   height: 63px;
   border-color: #f4ded12b;
 }
-.entered .exhibit {
+.immersive .exhibit {
   width: 100%;
   margin: 0;
 }
-.entered .artwork-frame {
+.immersive .artwork-frame {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -361,28 +244,63 @@ a {
   border: 0;
   box-shadow: none;
 }
-.entered .art-index {
+.immersive .art-index {
   bottom: 24px;
   left: 24px;
   right: 24px;
 }
-.entered .art-corner {
-  display: none;
+.work-title {
+  position: fixed;
+  z-index: 4;
+  top: clamp(92px, 15svh, 160px);
+  left: max(24px, 5vw);
+  width: min(470px, 45vw);
+  padding-left: 19px;
+  border-left: 2px solid #ac4d4b;
+  color: #eee7df;
+  text-shadow: 0 2px 16px #000;
+  pointer-events: none;
 }
-.entered .study-rail {
+.work-title > span {
+  font:
+    9px/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.18em;
+}
+.work-title h1 {
+  margin: 11px 0 9px;
+  font:
+    800 clamp(36px, 5vw, 72px)/0.9 Arial,
+    Helvetica,
+    sans-serif;
+  letter-spacing: -0.075em;
+}
+.work-title h1 span {
+  color: #c34643;
+}
+.work-title p {
+  margin: 0;
+  color: #b8aaa5;
+  font:
+    italic 13px/1.5 Georgia,
+    serif;
+}
+.immersive .study-rail {
   position: fixed;
   left: 24px;
   bottom: 77px;
   width: auto;
   margin: 0;
 }
-.entered .study-rail button {
+.immersive .study-rail button {
   color: #d8c8b9;
 }
-.entered .study-rail button[aria-pressed="true"] {
+.immersive .study-rail button[aria-pressed="true"] {
   color: #fff1e2;
 }
-.entered .field-controls {
+.immersive .field-controls {
   position: fixed;
   left: 50%;
   bottom: 13px;
@@ -396,15 +314,15 @@ a {
   background: #110e0ddc;
   backdrop-filter: blur(18px);
 }
-.entered .field-controls button {
+.immersive .field-controls button {
   padding: 8px 16px;
   white-space: nowrap;
   color: #f8e9db;
 }
-.entered .field-controls button + button {
+.immersive .field-controls button + button {
   border-left: 1px solid #f0dbcc3b;
 }
-.entered .field-controls button:hover {
+.immersive .field-controls button:hover {
   color: #ff7750;
 }
 .tuning {
@@ -486,136 +404,6 @@ a {
   color: #b4a297;
   line-height: 1.55;
 }
-.youtube-mini {
-  position: fixed;
-  z-index: 13;
-  right: 24px;
-  bottom: 77px;
-  width: min(322px, calc(100vw - 24px));
-  border: 1px solid #897669;
-  background: #141210eb;
-  color: #f8eee3;
-  box-shadow: 0 12px 45px #0008;
-  backdrop-filter: blur(16px);
-}
-.tuning-open .youtube-mini {
-  visibility: hidden;
-  pointer-events: none;
-}
-.gallery:not(.entered) .youtube-mini:not(.is-open) {
-  display: none;
-}
-.mini-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 11px;
-  cursor: grab;
-  touch-action: none;
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.mini-head i {
-  color: #e85b38;
-  font-style: normal;
-}
-.mini-head button {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 5px;
-  border: 0;
-  background: none;
-  color: #f8eee3;
-}
-.mini-body {
-  padding: 0 10px 11px;
-}
-.mini-body[hidden],
-.mini-body [hidden] {
-  display: none;
-}
-.mini-body iframe {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16/9;
-  border: 0;
-}
-.mini-body label {
-  display: block;
-  margin: 8px 0;
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-}
-.mini-input {
-  display: flex;
-}
-.mini-input input {
-  flex: 1;
-  min-width: 0;
-  min-height: 39px;
-  padding: 8px;
-  border: 1px solid #847264;
-  background: #211b18;
-  color: #fff1e5;
-  font-size: 12px;
-}
-.mini-input button {
-  min-height: 39px;
-  padding: 8px;
-  border: 1px solid #847264;
-  background: none;
-  color: #fff1e5;
-  font-size: 11px;
-}
-.mini-body p {
-  margin: 8px 0 0;
-  color: #ff8668;
-  font-size: 11px;
-}
-.mini-cancel {
-  margin-top: 9px;
-  border: 0;
-  padding: 2px 0;
-  background: none;
-  color: #d1b8a5;
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-}
-.mini-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 9px;
-  font:
-    10px ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace;
-}
-.mini-actions button {
-  border: 0;
-  padding: 0;
-  background: none;
-  color: #faeee2;
-  cursor: pointer;
-  font: inherit;
-}
-.mini-actions a {
-  text-decoration: none;
-  color: #d1b8a5;
-}
 .error {
   position: fixed;
   z-index: 20;
@@ -645,7 +433,6 @@ a {
     display: none;
   }
   .exhibit,
-  .entrance,
   .study-rail,
   .field-controls {
     width: 100%;
@@ -663,28 +450,6 @@ a {
       0 0 0 10px #4b4439,
       7px 12px 20px #1d171741;
   }
-  .placard {
-    min-height: 75px;
-    padding: 17px 1px 0;
-  }
-  .placard h1 {
-    font-size: 35px;
-  }
-  .placard-aside {
-    display: none;
-  }
-  .entrance {
-    margin-top: 8px;
-  }
-  .entrance-line {
-    gap: 10px;
-  }
-  .entrance input {
-    font-size: 13px;
-  }
-  .entrance-line button {
-    font-size: 37px;
-  }
   .study-rail {
     margin-top: 15px;
   }
@@ -696,30 +461,45 @@ a {
   .field-controls button {
     font-size: 9px;
   }
-  .entered {
+  .immersive {
     padding: 0;
   }
-  .entered .gallery-header {
+  .immersive .gallery-header {
     left: 14px;
     right: 14px;
     height: 55px;
   }
-  .entered .artwork-frame {
+  .immersive .artwork-frame {
     height: 100svh;
   }
-  .entered .art-index {
+  .immersive .art-index {
     left: 14px;
     right: 14px;
     bottom: 127px;
     font-size: 8px;
   }
-  .entered .study-rail {
+  .work-title {
+    top: 115px;
+    left: 14px;
+    width: min(330px, calc(100vw - 28px));
+    padding-left: 12px;
+  }
+  .work-title > span {
+    font-size: 7px;
+  }
+  .work-title h1 {
+    font-size: clamp(34px, 9vw, 48px);
+  }
+  .work-title p {
+    font-size: 11px;
+  }
+  .immersive .study-rail {
     top: 64px;
     left: 14px;
     bottom: auto;
     gap: 13px;
   }
-  .entered .field-controls {
+  .immersive .field-controls {
     left: 10px;
     right: 10px;
     bottom: max(10px, env(safe-area-inset-bottom));
@@ -728,20 +508,13 @@ a {
     max-width: none;
     justify-content: stretch;
   }
-  .entered .field-controls button {
+  .immersive .field-controls button {
     flex: 1;
     min-width: 0;
     padding: 8px 5px;
     font-size: 8px;
   }
-  .youtube-mini {
-    right: 10px;
-    left: 10px;
-    bottom: 65px;
-    width: auto;
-    max-height: 50svh;
-    overflow: auto;
-  }
+
   .tuning {
     top: auto;
     left: 10px;
@@ -749,9 +522,6 @@ a {
     bottom: 65px;
     width: auto;
     max-height: 57svh;
-  }
-  .entered .youtube-mini {
-    bottom: 70px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

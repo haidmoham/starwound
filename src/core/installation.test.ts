@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { FIXED_DT, FixedClock } from "./clock.ts";
-import { DEPARTURE_RADIUS, Installation, MAX_DEPARTURES } from "./installation.ts";
+import {
+  DEPARTURE_RADIUS,
+  Installation,
+  MAX_DEPARTURES,
+} from "./installation.ts";
 import { DEFAULT_PARAMETERS } from "./orbit.ts";
 import { FrameBudget } from "./quality.ts";
 
@@ -16,7 +20,7 @@ function advance(installation: Installation, seconds: number): void {
   for (let tick = 0; tick < seconds / FIXED_DT; tick++) installation.step();
 }
 
-test("a proper void precedes the default fall study's first modeled disturbance", () => {
+test("the default fall study has a quiet interval before its first modeled disturbance", () => {
   const installation = new Installation(fall);
   assert.equal(installation.world.time, 0);
   assert.equal(installation.scene().shock, 0);
@@ -75,7 +79,7 @@ test("render adaptation does not change simulation or event timing", () => {
   assert.deepEqual(a.world.positions, b.world.positions);
 });
 
-test("other studies keep a void before showing early departures", () => {
+test("other studies delay the flare after early departures", () => {
   for (const parameters of [
     { ...fall, angularMomentum: 1.02, dispersion: 0.015, receptivity: 0.35 },
     { ...fall, angularMomentum: 1.24, dispersion: 0.11, receptivity: 0.9 },
@@ -91,7 +95,10 @@ test("other studies keep a void before showing early departures", () => {
 
 test("invalid model configuration fails before installation begins", () => {
   assert.throws(() => new Installation({ ...fall, seed: -1 }), RangeError);
-  assert.throws(() => new Installation({ ...fall, particleCount: Infinity }), RangeError);
+  assert.throws(
+    () => new Installation({ ...fall, particleCount: Infinity }),
+    RangeError,
+  );
 });
 
 test("the frame budget uses sustained evidence and records upper-tail spikes", () => {

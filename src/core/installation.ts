@@ -93,7 +93,7 @@ export class Installation {
         ruptureAt,
         shock: 0,
         aftermath: 0,
-      trajectoryOpacity: 0.025 + whisper * 0.07,
+        trajectoryOpacity: 0.23 + whisper * 0.14,
       };
     }
     const age = time - ruptureAt;
