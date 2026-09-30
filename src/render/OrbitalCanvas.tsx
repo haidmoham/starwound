@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { FIXED_DT, FixedClock } from "../core/clock.ts";
-import { syntheticForcing } from "../core/forcing.ts";
-import { HISTORY_CAPACITY, HISTORY_STRIDE, OrbitWorld } from "../core/orbit.ts";
-import type { OrbitParameters } from "../core/orbit.ts";
+import { Installation } from "../core/installation.ts";
+import { HISTORY_CAPACITY, HISTORY_STRIDE } from "../core/orbit.ts";
 
 // Canvas has a downward y axis, so this is the opposite sign of the backdrop's rotation.
 const PROJECTION_ANGLE = 0.33;
@@ -18,41 +17,35 @@ export interface ViewParameters {
 }
 
 interface Props {
-  parameters: Readonly<OrbitParameters>;
+  installation: Installation;
   view: Readonly<ViewParameters>;
   paused: boolean;
   onError: (message: string) => void;
-  resetKey: number;
-}
-
-function createOpeningWorld(parameters: Readonly<OrbitParameters>): OrbitWorld {
-  const world = new OrbitWorld(parameters);
-  // The exhibition opens on a developed trajectory, not an empty first frame.
-  for (let tick = 0; tick < Math.floor(3 / FIXED_DT); tick++) {
-    world.step(syntheticForcing(world.time));
-  }
-  return world;
 }
 
 function startCanvasFallback(
   canvas: HTMLCanvasElement,
-  parameters: Readonly<OrbitParameters>,
+  installation: Installation,
   viewRef: React.RefObject<Readonly<ViewParameters>>,
   pausedRef: React.RefObject<boolean>,
 ): () => void {
   const context = canvas.getContext("2d");
   if (!context) return () => {};
-  const world = createOpeningWorld(parameters);
+  const world = installation.world;
+  const parameters = world.parameters;
   const clock = new FixedClock();
+  const profiling = new URLSearchParams(window.location.search).has("profile");
+  let lastProfile = installation.budget.stats;
   let frame = 0;
   let previous = performance.now();
   const draw = (now: number) => {
+    const workStart = performance.now();
     const elapsed = Math.max(0, (now - previous) / 1000);
     previous = now;
     if (!document.hidden) {
       if (pausedRef.current) clock.discard();
-      else
-        clock.advance(elapsed, () => world.step(syntheticForcing(world.time)));
+      else clock.advance(elapsed, () => installation.step());
+      canvas.style.opacity = String(installation.scene().trajectoryOpacity);
       const rect = canvas.getBoundingClientRect();
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = Math.max(1, Math.floor(rect.width * pixelRatio));
@@ -78,7 +71,9 @@ function startCanvasFallback(
           ),
         ),
       );
-      for (let age = samples - 1; age > 0; age--) {
+      const particleStride = installation.budget.detail === 0 ? 2 : 1;
+      const historyStride = installation.budget.detail === 0 ? 2 : 1;
+      for (let age = samples - 1; age > 0; age -= historyStride) {
         const older =
           (world.historyHead - age + HISTORY_CAPACITY) % HISTORY_CAPACITY;
         const newer = (older + 1) % HISTORY_CAPACITY;
@@ -87,7 +82,7 @@ function startCanvasFallback(
         for (
           let particle = 0;
           particle < parameters.particleCount;
-          particle++
+          particle += particleStride
         ) {
           const a = (older * parameters.particleCount + particle) * 2;
           const b = (newer * parameters.particleCount + particle) * 2;
@@ -99,13 +94,25 @@ function startCanvasFallback(
         context.stroke();
       }
       context.fillStyle = "#fff5e5";
-      for (let particle = 0; particle < parameters.particleCount; particle++) {
+      for (let particle = 0; particle < parameters.particleCount; particle += particleStride) {
         const [x, y] = project(
           world.positions[particle * 2],
           world.positions[particle * 2 + 1],
         );
         context.fillRect(x, y, 1.5 * pixelRatio, 1.5 * pixelRatio);
       }
+      installation.budget.record(elapsed * 1000, performance.now() - workStart);
+      if (profiling && installation.budget.stats !== lastProfile) {
+        lastProfile = installation.budget.stats;
+        document.documentElement.dataset.starwoundProfile = JSON.stringify({
+          renderer: "canvas2d",
+          time: world.time,
+          ...lastProfile,
+        });
+      }
+    } else {
+      clock.discard();
+      installation.budget.discard();
     }
     frame = requestAnimationFrame(draw);
   };
@@ -114,11 +121,10 @@ function startCanvasFallback(
 }
 
 export function OrbitalCanvas({
-  parameters,
+  installation,
   view,
   paused,
   onError,
-  resetKey,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
@@ -151,7 +157,7 @@ export function OrbitalCanvas({
       canvas.style.display = "none";
       const stop = startCanvasFallback(
         fallback,
-        parameters,
+        installation,
         viewRef,
         pausedRef,
       );
@@ -167,8 +173,11 @@ export function OrbitalCanvas({
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
     camera.position.z = 10;
-    const world = createOpeningWorld(parameters);
+    const world = installation.world;
+    const parameters = world.parameters;
     const clock = new FixedClock();
+    const profiling = new URLSearchParams(window.location.search).has("profile");
+    let lastProfile = installation.budget.stats;
     const maxSegments = parameters.particleCount * (HISTORY_CAPACITY - 1);
     const segmentPositions = new Float32Array(maxSegments * 6);
     const segmentColors = new Float32Array(maxSegments * 6);
@@ -228,24 +237,31 @@ export function OrbitalCanvas({
     observer.observe(canvas);
     resize();
     let contextLost = false;
+    let stopFallback: (() => void) | null = null;
+    let fallbackCanvas: HTMLCanvasElement | null = null;
     const loseContext = (event: Event) => {
       event.preventDefault();
+      if (contextLost) return;
       contextLost = true;
-      onError("Graphics context lost. Reload to restart the study.");
+      fallbackCanvas = document.createElement("canvas");
+      fallbackCanvas.className = "world";
+      fallbackCanvas.setAttribute("aria-hidden", "true");
+      canvas.after(fallbackCanvas);
+      canvas.style.display = "none";
+      stopFallback = startCanvasFallback(fallbackCanvas, installation, viewRef, pausedRef);
+      onError("");
     };
     canvas.addEventListener("webglcontextlost", loseContext);
     let frame = 0;
     let previous = performance.now();
 
     const animate = (now: number) => {
+      const workStart = performance.now();
       const elapsed = Math.max(0, (now - previous) / 1000);
       previous = now;
       if (!document.hidden && !contextLost) {
         if (pausedRef.current) clock.discard();
-        else
-          clock.advance(elapsed, () =>
-            world.step(syntheticForcing(world.time)),
-          );
+        else clock.advance(elapsed, () => installation.step());
         const currentView = viewRef.current;
         const samples = Math.min(
           world.historyCount,
@@ -255,7 +271,9 @@ export function OrbitalCanvas({
           ),
         );
         let cursor = 0;
-        for (let age = samples - 1; age > 0; age--) {
+        const particleStride = installation.budget.detail === 0 ? 2 : 1;
+        const historyStride = installation.budget.detail === 0 ? 2 : 1;
+        for (let age = samples - 1; age > 0; age -= historyStride) {
           const older =
             (world.historyHead - age + HISTORY_CAPACITY) % HISTORY_CAPACITY;
           const newer = (older + 1) % HISTORY_CAPACITY;
@@ -263,7 +281,7 @@ export function OrbitalCanvas({
           for (
             let particle = 0;
             particle < parameters.particleCount;
-            particle++
+            particle += particleStride
           ) {
             const a = (older * parameters.particleCount + particle) * 2;
             const b = (newer * parameters.particleCount + particle) * 2;
@@ -284,14 +302,18 @@ export function OrbitalCanvas({
         geometry.setDrawRange(0, cursor / 3);
         geometry.getAttribute("position").needsUpdate = true;
         geometry.getAttribute("color").needsUpdate = true;
-        for (let i = 0; i < parameters.particleCount; i++) {
-          tipPositions[i * 3] = world.positions[i * 2];
-          tipPositions[i * 3 + 1] = world.positions[i * 2 + 1];
-          tipPositions[i * 3 + 2] = 0;
+        let tipCount = 0;
+        for (let i = 0; i < parameters.particleCount; i += particleStride) {
+          tipPositions[tipCount * 3] = world.positions[i * 2];
+          tipPositions[tipCount * 3 + 1] = world.positions[i * 2 + 1];
+          tipPositions[tipCount * 3 + 2] = 0;
+          tipCount++;
         }
         tipGeometry.getAttribute("position").needsUpdate = true;
-        material.opacity = currentView.exposure;
-        tipMaterial.opacity = Math.min(1, currentView.exposure + 0.2);
+        tipGeometry.setDrawRange(0, tipCount);
+        const sceneState = installation.scene();
+        material.opacity = currentView.exposure * sceneState.trajectoryOpacity;
+        tipMaterial.opacity = Math.min(1, currentView.exposure + 0.2) * sceneState.trajectoryOpacity;
         const halfHeight = currentView.extent * Math.max(1, 1 / aspect);
         camera.left = -halfHeight * aspect;
         camera.right = halfHeight * aspect;
@@ -299,8 +321,18 @@ export function OrbitalCanvas({
         camera.bottom = -halfHeight;
         camera.updateProjectionMatrix();
         renderer.render(scene, camera);
+        installation.budget.record(elapsed * 1000, performance.now() - workStart);
+        if (profiling && installation.budget.stats !== lastProfile) {
+          lastProfile = installation.budget.stats;
+          document.documentElement.dataset.starwoundProfile = JSON.stringify({
+            renderer: "webgl",
+            time: world.time,
+            ...lastProfile,
+          });
+        }
       } else {
         clock.discard();
+        if (document.hidden) installation.budget.discard();
       }
       frame = requestAnimationFrame(animate);
     };
@@ -309,6 +341,9 @@ export function OrbitalCanvas({
       cancelAnimationFrame(frame);
       observer.disconnect();
       canvas.removeEventListener("webglcontextlost", loseContext);
+      stopFallback?.();
+      fallbackCanvas?.remove();
+      canvas.style.display = "";
       geometry.dispose();
       material.dispose();
       tipGeometry.dispose();
@@ -316,7 +351,7 @@ export function OrbitalCanvas({
       renderer.dispose();
       renderer.forceContextLoss();
     };
-  }, [parameters, onError, resetKey]);
+  }, [installation, onError]);
 
   return (
     <canvas

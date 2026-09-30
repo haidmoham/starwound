@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Installation } from "./core/installation.ts";
 import { DEFAULT_PARAMETERS } from "./core/orbit.ts";
 import type { OrbitParameters } from "./core/orbit.ts";
 import { parseYouTubeId } from "./core/youtube.ts";
@@ -41,6 +42,10 @@ export function App() {
   const [videoId, setVideoId] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
   const [error, setError] = useState("");
+  const installation = useMemo(
+    () => new Installation(parameters),
+    [parameters, resetKey],
+  );
 
   useEffect(() => {
     const hide = () => {
@@ -101,7 +106,9 @@ export function App() {
     const context = canvas.getContext("2d");
     if (!context) return;
     context.drawImage(backdrop, 0, 0, canvas.width, canvas.height);
+    context.globalAlpha = Number(world.style.opacity || 1);
     context.drawImage(world, 0, 0, canvas.width, canvas.height);
+    context.globalAlpha = 1;
     const anchor = document.createElement("a");
     anchor.download = `starwound-${parameters.seed}.png`;
     anchor.href = canvas.toDataURL("image/png");
@@ -127,13 +134,12 @@ export function App() {
 
       <section className="exhibit" aria-label="Starwound orbital installation">
         <div className="artwork-frame">
-          <RuptureBackdrop seed={parameters.seed} paused={paused} />
+          <RuptureBackdrop installation={installation} />
           <OrbitalCanvas
-            parameters={parameters}
+            installation={installation}
             view={view}
             paused={paused}
             onError={setError}
-            resetKey={resetKey}
           />
           <div className="art-grain" aria-hidden="true" />
           <div className="art-index" aria-hidden="true">
