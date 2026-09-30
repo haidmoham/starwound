@@ -56,9 +56,18 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     if (distance < radius * 0.75) continue;
     const cold = next() > 0.92;
     context.fillStyle = cold ? "#9cc9d6" : "#f2e9d4";
-    context.globalAlpha = (cold ? 0.48 : 0.12 + next() * 0.39) * (0.42 + scene.aftermath * 0.58);
+    context.globalAlpha = (cold ? 0.48 : 0.12 + next() * 0.39) * (0.65 + scene.aftermath * 0.35);
     const point = (next() > 0.985 ? 1.8 : 0.7) * ratio;
     context.fillRect(x, y, point, point);
+  }
+  context.globalAlpha = 1;
+  for (let index = 0; index < 17; index++) {
+    const x = next() * width;
+    const y = next() * height;
+    if (Math.hypot(x - centerX, y - centerY) < radius * 0.9) continue;
+    context.fillStyle = index % 5 === 0 ? "#9cc9d6" : "#e5dfd4";
+    context.globalAlpha = 0.15 + next() * 0.22;
+    context.fillRect(x, y, 1.1 * ratio, 1.1 * ratio);
   }
   context.globalAlpha = 1;
 
@@ -67,7 +76,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.translate(centerX, centerY);
   context.rotate(-0.33);
   context.scale(1, 0.59);
-  const ringAlpha = Math.min(1, scene.shock * 0.9 + scene.aftermath * 0.17);
+  const ringAlpha = Math.min(1, scene.shock * 0.9 + scene.aftermath * 0.22);
   const ringMarks = detail === 0 ? 150 : detail === 1 ? 300 : 490;
   for (let index = 0; index < ringMarks; index++) {
     const band = radius * (0.72 + next() * 0.77);
@@ -89,7 +98,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.globalAlpha = 1;
 
   // The tearing fan is asymmetric and finite; the quiet field gives it force.
-  const ejectAlpha = Math.min(1, scene.shock * 0.83 + scene.aftermath * 0.1);
+  const ejectAlpha = Math.min(1, scene.shock * 0.83 + scene.aftermath * 0.13);
   const ejectMarks = detail === 0 ? 70 : detail === 1 ? 150 : 250;
   for (let index = 0; index < ejectMarks; index++) {
     const angle =
@@ -160,9 +169,17 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
       if (age < 0) continue;
       const [x1, y1] = project(event.x, event.y);
       const [x2, y2] = project(event.x + event.vx * 0.82, event.y + event.vy * 0.82);
+      const maturity = Math.min(1, age / 1.5);
+      context.strokeStyle = "#020203";
+      context.globalAlpha = maturity * 0.6;
+      context.lineWidth = 3.2 * ratio;
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.quadraticCurveTo((x1 + x2) / 2 - 0.05 * size, (y1 + y2) / 2, x2, y2);
+      context.stroke();
       context.strokeStyle = event.particle % 7 === 0 ? "#fff1da" : "#e75b3d";
-      context.globalAlpha = Math.min(1, age / 1.5) * (0.15 + scene.shock * 0.35);
-      context.lineWidth = (event.particle % 7 === 0 ? 1.15 : 0.7) * ratio;
+      context.globalAlpha = maturity * (0.35 + scene.shock * 0.38);
+      context.lineWidth = (event.particle % 7 === 0 ? 1.4 : 1) * ratio;
       context.beginPath();
       context.moveTo(x1, y1);
       context.quadraticCurveTo((x1 + x2) / 2 - 0.05 * size, (y1 + y2) / 2, x2, y2);

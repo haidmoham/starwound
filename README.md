@@ -1,6 +1,6 @@
 # Starwound
 
-An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. Its trajectories pass through an authored field of projected light, rupture, and debris.
+An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. It opens from a near-void: modeled outward crossings bring a brief rupture, and sparse marks remain as it settles into a changed quiet.
 
 The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. Collapsing the dock keeps its iframe mounted. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
 
@@ -8,7 +8,7 @@ The entrance accepts any YouTube video link, or no link. The video plays in a sm
 
 The opening presents one framed study in a quiet gallery space. Entering expands that same running world to the viewport. The `fall`, `shear`, and `eject` studies change initial conditions and restart the world. Freeze, restart, still export, and a small tuning sheet remain available. The YouTube dock accepts watch, short, live, embed, and `youtu.be` links; a video can forbid embedding, in which case the dock offers an ordinary YouTube link.
 
-The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. The tilted incandescent annulus and black center are authored presentation. They are not general relativity, an accretion simulation, or gravitational lensing. The drawn rupture evolves slowly; freeze stops both the world and that presentation motion.
+The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. Crossings of a compositional radius are departures, not a claim of gravitational escape. The tilted incandescent annulus and black center are authored presentation. They are not general relativity, an accretion simulation, or gravitational lensing. The drawn rupture and its scars now follow the world's seeded event history; restart replays both together.
 
 ## Development
 
@@ -21,7 +21,7 @@ npm run check
 npm run build
 ```
 
-WebGL draws the trajectories when available; Canvas 2D is the fallback. Both use the same projected geometry. The artwork respects reduced motion and pauses when the tab is hidden. The `starwound.x.dev` shorthand means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
+WebGL draws the trajectories when available; Canvas 2D is the fallback, including after a lost WebGL context. Both read the same world and event history. Drawing density adapts to sustained frame times without changing simulation ticks or events. The artwork respects reduced motion and pauses when the tab is hidden. Add `?profile=1` to expose rolling frame statistics in `document.documentElement.dataset.starwoundProfile` for diagnostics. The `starwound.x.dev` shorthand means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
 
 ## Project notes
 

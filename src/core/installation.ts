@@ -93,7 +93,7 @@ export class Installation {
         ruptureAt,
         shock: 0,
         aftermath: 0,
-        trajectoryOpacity: 0.012 + whisper * 0.055,
+      trajectoryOpacity: 0.025 + whisper * 0.07,
       };
     }
     const age = time - ruptureAt;
@@ -104,7 +104,7 @@ export class Installation {
       ruptureAt,
       shock,
       aftermath,
-      trajectoryOpacity: Math.min(1, 0.04 + shock * 0.91 + aftermath * 0.28),
+      trajectoryOpacity: Math.min(1, 0.04 + shock * 0.91 + aftermath * 0.35),
     };
   }
 }

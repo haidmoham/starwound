@@ -1,5 +1,14 @@
 # Verification ledger
 
+## Seeded rupture review — 2026-09-30
+
+- On branch `codex/finish-starwound-installation`, `npm ci --no-audit --no-fund` succeeded with `NPM_CONFIG_CACHE=/tmp/starwound-npm-cache` after this container's default npm cache path failed. `npm run check` passed TypeScript, Oxlint, and 20 tests; `npm run build` passed with Vite's pre-existing large-chunk warning; `git diff --check` passed.
+- New tests cover the default study's void and modeled first departure, identical model and event replay after reset, 30/60 Hz logical equivalence, quality adaptation's separation from event timing, early events in the other studies, malformed model configuration, and sustained frame-budget behavior. The tests do not constitute a visual or GPU performance check.
+- A Vercel review preview was inspected in the cloud browser. After `begin again`, the first seconds appeared as a near-void. The fall study's first outward crossing was measured in the pure model at about 8.5 simulated seconds; the browser then visibly showed the rupture and its quieter aftermath. Framed and full-field views both rendered. This browser had no WebGL, so the Canvas 2D fallback was exercised; YouTube audio and a physical device were not tested in this pass.
+- In that cloud fallback at 1180 × 748 full-field size and high drawing detail, a 120-frame rolling window reported mean 16.66 ms, p90 16.7 ms, p99 16.8 ms, and p95 main-thread drawing work 3.5 ms. A window crossing a visual transition had a 66.6 ms maximum frame interval. These are diagnostic samples from a cloud browser, not average-phone or iPhone 17 Pro measurements. CPU drawing time is not GPU time.
+- The current review preview was `https://starwound-prlv4ckvz-zarnab.vercel.app/` at GitHub commit `7596dbbdc48110d3a2768a4a861124946659a36f` (Ready). Later visual refinements require another preview pass. The production `main` branch and mirrored domains remain unchanged.
+- Still to verify: a hardware-WebGL browser, context-loss recovery in a real browser, a physical average phone and iPhone 17 Pro, reduced-motion experience on-device, and final-frame transition profiling after the review refinements. Do not infer these from CI or cloud fallback.
+
 ## Tidal installation revision — 2026-09-24, local
 
 - Follow-up: after starting an embedded video, collapsing and reopening the dock kept the same iframe DOM node mounted. This guards against restarting the embed on collapse. Playback continuity of its audio was not directly measured.

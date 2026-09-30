@@ -75,6 +75,25 @@ test("render adaptation does not change simulation or event timing", () => {
   assert.deepEqual(a.world.positions, b.world.positions);
 });
 
+test("other studies keep a void before showing early departures", () => {
+  for (const parameters of [
+    { ...fall, angularMomentum: 1.02, dispersion: 0.015, receptivity: 0.35 },
+    { ...fall, angularMomentum: 1.24, dispersion: 0.11, receptivity: 0.9 },
+  ]) {
+    const installation = new Installation(parameters);
+    advance(installation, 3);
+    assert.ok(installation.departures.length > 0);
+    assert.equal(installation.scene().shock, 0);
+    advance(installation, 4);
+    assert.ok(installation.scene().aftermath > 0);
+  }
+});
+
+test("invalid model configuration fails before installation begins", () => {
+  assert.throws(() => new Installation({ ...fall, seed: -1 }), RangeError);
+  assert.throws(() => new Installation({ ...fall, particleCount: Infinity }), RangeError);
+});
+
 test("the frame budget uses sustained evidence and records upper-tail spikes", () => {
   const budget = new FrameBudget();
   for (let i = 0; i < 120; i++) budget.record(32, 18);
@@ -82,6 +101,7 @@ test("the frame budget uses sustained evidence and records upper-tail spikes", (
   for (let i = 0; i < 120; i++) budget.record(32, 18);
   assert.equal(budget.detail, 0);
   assert.equal(budget.stats?.p99Ms, 32);
+  assert.equal(budget.stats?.maxMs, 32);
   for (let window = 0; window < 3; window++) {
     for (let i = 0; i < 120; i++) budget.record(16.7, 4);
   }
