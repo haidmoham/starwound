@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { FIXED_DT } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
+import { drawWoundBloom } from "./WoundBloom.ts";
 
 function random(seed: number) {
   let state = seed >>> 0;
@@ -166,26 +167,53 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.beginPath();
   context.arc(0, 0, coreRadius * 1.42, 0, Math.PI * 2);
   context.fill();
-  // The field holds its center. Only the sector attached to the cut strains.
-  // Fixed topology across quality tiers keeps the wound from changing shape.
-  const rings = detail === 0 ? 12 : 17;
+  // Electron-orbit metaphor only: authored planes share the wounded nucleus.
+  // Eccentricity, precession and passing phases differ; the camera never wanders.
+  const filament = random(seed ^ 0x32bfa1);
+  const rings = detail === 0 ? 14 : detail === 1 ? 26 : 40;
   for (let ring = 0; ring < rings; ring++) {
-    const ringRadius = coreRadius * (0.43 + ring * 0.14);
-    context.strokeStyle = ring % 3 === 0 ? "#ffe4c9" : "#9c3938";
-    context.globalAlpha = (0.23 + scene.shock * 0.15) * (1 - ring / 24);
-    context.lineWidth = (ring % 3 === 0 ? 0.8 : 0.5) * ratio;
-    context.beginPath();
-    for (let point = 0; point <= 120; point++) {
-      const angle = (point / 120) * Math.PI * 2;
-      const alongCut = Math.cos(angle + 0.44);
-      const strain = Math.pow(Math.max(0, -alongCut), 12);
+    const orbitRadius = coreRadius * (0.88 + filament() * 2.15);
+    const flatten = 0.16 + filament() * 0.65;
+    const plane = filament() * Math.PI;
+    const rate = (0.045 + filament() * 0.13) * (ring % 2 === 0 ? 1 : -1);
+    const offset = filament() * Math.PI * 2;
+    const whipPhase = filament() * Math.PI * 2;
+    const angleOfPlane = plane + phase * rate;
+    const c = Math.cos(angleOfPlane);
+    const sn = Math.sin(angleOfPlane);
+    const head = offset + phase * (0.38 + Math.abs(rate) * 4);
+    const pointAt = (angle: number): [number, number] => {
+      const nearPass = Math.sin(angle * 2 + whipPhase + phase * 0.27);
+      const whip =
+        Math.pow(Math.max(0, Math.cos(angle - head)), 12) *
+        (0.06 + opening * 0.9);
       const reach =
-        ringRadius * (1 - pressure * 0.018) +
-        coreRadius * strain * (0.16 + opening) * (ring / rings);
+        orbitRadius * (1 - pressure * 0.06 + nearPass * 0.085 + whip);
       const x = Math.cos(angle) * reach;
-      const y = Math.sin(angle) * reach;
-      if (point === 0) context.moveTo(x, y);
-      else context.lineTo(x, y);
+      const y = Math.sin(angle) * reach * flatten;
+      return [x * c - y * sn, x * sn + y * c];
+    };
+    context.strokeStyle =
+      ring % 5 === 0 ? "#f7d5b4" : ring % 3 === 0 ? "#ba554b" : "#71383e";
+    context.globalAlpha =
+      0.08 + (ring % 5 === 0 ? 0.07 : 0) + scene.shock * 0.09;
+    context.lineWidth = 0.55 * ratio;
+    context.beginPath();
+    for (let point = 0; point <= 84; point++) {
+      const position = pointAt((point / 84) * Math.PI * 2);
+      if (point === 0) context.moveTo(...position);
+      else context.lineTo(...position);
+    }
+    context.stroke();
+    // Unequal luminous passages make the tangled planes readable in motion.
+    context.strokeStyle = ring % 4 === 0 ? "#ffe4c5" : "#d55d50";
+    context.globalAlpha = 0.18 + scene.shock * 0.16;
+    context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
+    context.beginPath();
+    for (let point = 0; point <= 18; point++) {
+      const position = pointAt(head - 0.7 + (point / 18) * 0.7);
+      if (point === 0) context.moveTo(...position);
+      else context.lineTo(...position);
     }
     context.stroke();
   }
@@ -262,6 +290,17 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
       context.stroke();
     }
   }
+  drawWoundBloom(context, {
+    upper,
+    lower,
+    radius: coreRadius,
+    time: phase,
+    pressure,
+    shock: scene.shock,
+    detail,
+    pixelRatio: ratio,
+    seed,
+  });
   context.restore();
   context.globalAlpha = 1;
 
