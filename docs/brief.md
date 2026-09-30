@@ -2,7 +2,7 @@
 
 ## Current direction
 
-Starwound should feel like an art installation in someone's browser. Its subject is a wounded star in its dying breath, autonomous matter in flight, and the cosmic longing created by distance. It is not a visualizer. The owner’s latest request adds optional local soundtrack playback while keeping the immediate silent opening. The requested Baby Blue by nothing,nowhere. phrase-by-phrase choreography awaits a supplied audio source; no beat map or claim of listening is fabricated.
+Starwound should feel like an art installation in someone's browser. Its subject is a wounded star in its dying breath, autonomous matter in flight, and the cosmic longing created by distance. It is not a visualizer. The owner’s latest request adds optional local soundtrack playback while keeping the immediate silent opening. The supplied Baby Blue by nothing,nowhere. MP3 has a version-matched structural cue study derived from measured RMS and spectral transitions. The envelope follows media time when the exact file is chosen; no beat map, lyric interpretation, or claim of listening is fabricated.
 
 Open directly in the full field. The damaged star is already present, small enough to leave real darkness around it. A distant cold point and long negative space carry the pain of separation. The first modeled departure intensifies the wound briefly; the forceful phase fades into an altered quiet with persistent marks. Controls recede to the edges. The piece is complete in silence.
 

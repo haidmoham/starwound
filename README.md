@@ -2,7 +2,7 @@
 
 An interstellar generative-art installation for the browser. It opens directly on a dying, wounded star, with a distant last point of light across a severe black field. A deterministic softened-Newtonian particle world keeps moving without sound. Modeled outward crossings bring a brief flare; sparse marks remain as the work settles into a changed quiet.
 
-There is no entry gate. An optional sound drawer lets the visitor select a local audio file and use browser-native play, pause, seek, and volume controls. It never uploads the file, starts automatically, or drives the physical model. Song-specific choreography is not implemented; the artwork remains autonomous.
+There is no entry gate. An optional sound drawer lets the visitor select a local audio file and use browser-native play, pause, seek, and volume controls. It never uploads the file, starts automatically, or drives the physical model. The exact supplied Baby Blue MP3 is recognized locally by size and SHA-256 and enables a structural cue study tied to media time. Other files play alongside the autonomous artwork. The study is based on measured dynamics, not a claimed beat-perfect or listening-verified interpretation.
 
 ## Experience
 
