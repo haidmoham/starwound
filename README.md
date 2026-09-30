@@ -2,7 +2,7 @@
 
 An interstellar generative-art installation for the browser. It opens directly on a dying, wounded star, with a distant last point of light across a severe black field. A deterministic softened-Newtonian particle world keeps moving without sound. Modeled outward crossings bring a brief flare; sparse marks remain as the work settles into a changed quiet.
 
-There is no entry gate or media companion. The work is autonomous generative art, with no music input or reactivity.
+There is no entry gate. An optional sound drawer lets the visitor select a local audio file and use browser-native play, pause, seek, and volume controls. It never uploads the file, starts automatically, or drives the physical model. Song-specific choreography is not implemented; the artwork remains autonomous.
 
 ## Experience
 
@@ -30,4 +30,4 @@ WebGL draws the trajectories when available; Canvas 2D is the fallback, includin
 - [docs/architecture.md](docs/architecture.md): model and rendering boundaries.
 - [docs/verification.md](docs/verification.md): observed checks and release evidence.
 
-The first release explored local audio forcing. The owner's later direction explicitly removed audio reactivity. Historical checks remain in the verification ledger; the current experience has no local audio ingestion. No commercial recording, film footage, paid font, or third-party artwork is bundled.
+The first release explored local audio forcing. The owner removed audio reactivity, then explicitly requested optional local soundtrack playback. Historical checks remain in the verification ledger. The current soundtrack is independent playback, not audio analysis. No commercial recording, film footage, paid font, or third-party artwork is bundled.

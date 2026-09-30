@@ -31,7 +31,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const size = Math.min(width, height);
   const centerX = width * 0.5;
   const centerY = height * 0.5;
-  const radius = size * 0.22;
+  const radius = size * 0.195;
   // A long held contraction and short release, anchored to the world's clock.
   // This is authored pressure, not another physical force or a camera shake.
   const breath = (phase % 13) / 13;
@@ -58,12 +58,12 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.fillStyle = haze;
   context.globalAlpha = Math.min(
     1,
-    0.16 + scene.shock * 0.75 + scene.aftermath * 0.12,
+    0.16 + scene.shock * 0.75 + scene.aftermath * 0.035,
   );
   context.fillRect(0, 0, width, height);
   context.globalAlpha = 1;
 
-  const starDensity = detail === 0 ? 7000 : detail === 1 ? 4200 : 2900;
+  const starDensity = detail === 0 ? 12000 : detail === 1 ? 9000 : 7000;
   for (
     let index = 0;
     index < Math.round((width * height) / starDensity);
@@ -76,7 +76,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     const cold = next() > 0.92;
     context.fillStyle = cold ? "#9cc9d6" : "#f2e9d4";
     context.globalAlpha =
-      (cold ? 0.48 : 0.12 + next() * 0.39) * (0.65 + scene.aftermath * 0.35);
+      (cold ? 0.48 : 0.06 + next() * 0.2) * (0.65 + scene.aftermath * 0.35);
     const point = (next() > 0.985 ? 1.8 : 0.7) * ratio;
     context.fillRect(x, y, point, point);
   }
@@ -96,7 +96,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.translate(centerX, centerY);
   const coronaAlpha = Math.min(
     1,
-    0.24 + scene.shock * 0.76 + scene.aftermath * 0.17,
+    0.12 + scene.shock * 0.88 + scene.aftermath * 0.04,
   );
   const rays = detail === 0 ? 70 : detail === 1 ? 135 : 230;
   for (let index = 0; index < rays; index++) {
@@ -122,7 +122,10 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.globalAlpha = 1;
 
   // The tearing fan is asymmetric and finite; the quiet field gives it force.
-  const ejectAlpha = Math.min(1, scene.shock * 0.83 + scene.aftermath * 0.13);
+  const ejectAlpha = Math.min(
+    1,
+    Math.pow(scene.shock, 1.6) * 0.95 + scene.aftermath * 0.025,
+  );
   const ejectMarks = detail === 0 ? 70 : detail === 1 ? 150 : 250;
   for (let index = 0; index < ejectMarks; index++) {
     const angle =
@@ -196,7 +199,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     context.strokeStyle =
       ring % 5 === 0 ? "#f7d5b4" : ring % 3 === 0 ? "#ba554b" : "#71383e";
     context.globalAlpha =
-      0.17 + (ring % 5 === 0 ? 0.08 : 0) + scene.shock * 0.1;
+      0.07 + (ring % 5 === 0 ? 0.06 : 0) + scene.shock * 0.27;
     context.lineWidth = 0.55 * ratio;
     context.beginPath();
     for (let point = 0; point <= 84; point++) {
@@ -207,7 +210,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     context.stroke();
     // Unequal luminous passages make the tangled planes readable in motion.
     context.strokeStyle = ring % 4 === 0 ? "#ffe4c5" : "#d55d50";
-    context.globalAlpha = 0.3 + scene.shock * 0.2;
+    context.globalAlpha = 0.16 + scene.shock * 0.36;
     context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
     context.beginPath();
     for (let point = 0; point <= 18; point++) {

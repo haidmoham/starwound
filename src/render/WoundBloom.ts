@@ -129,7 +129,7 @@ export function drawWoundBloom(
       Math.sin(age * 3.5 + index) * radius * 0.025 * life;
     const y = root[1] + side * speed * (age - age * age * 0.13);
     const fade = Math.min(1, age / 0.12) * Math.pow(1 - life, 1.6);
-    context.globalAlpha = fade * (0.45 + shock * 0.4);
+    context.globalAlpha = fade * (0.16 + Math.pow(shock, 1.3) * 0.74);
     context.strokeStyle =
       index % 7 === 0 ? "#ffd7ab" : index % 3 === 0 ? "#ff6350" : "#ae293a";
     context.lineWidth = (index % 5 === 0 ? 1.3 : 0.65) * pixelRatio;

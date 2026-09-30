@@ -13,7 +13,7 @@ src/render/RuptureBackdrop.tsx  authored wounded star, distant light, and ejecta
 src/App.tsx                     direct field, controls, lifecycle, still export
 ```
 
-No media, audio analysis, file upload, or media synchronization exists. The full-field renderer starts on page load. Both renderer paths and the authored backdrop read one `Installation` object. Only the trajectory renderer advances its clock; the backdrop reads the world's logical time and event history.
+Optional `src/media/LocalSoundtrack.tsx` playback is isolated from the installation. A user-selected File gets one object URL and an HTML audio element with native controls. Replacement, removal, and unmount pause and detach the source and revoke its URL. No upload, audio analysis, AudioContext, or media synchronization exists. Native playback avoids an unnecessary Web Audio graph until an authorized cue or gain-processing need exists. The full-field renderer starts on page load. Both renderer paths and the authored backdrop read one `Installation` object. Only the trajectory renderer advances its clock; the backdrop reads the world's logical time and event history.
 
 ## Model
 

@@ -5,6 +5,7 @@ import type { OrbitParameters } from "./core/orbit.ts";
 import { OrbitalCanvas } from "./render/OrbitalCanvas.tsx";
 import type { ViewParameters } from "./render/OrbitalCanvas.tsx";
 import { RuptureBackdrop } from "./render/RuptureBackdrop.tsx";
+import { LocalSoundtrack } from "./media/LocalSoundtrack.tsx";
 
 const STUDIES = [
   { name: "fall", momentum: 0.66, dispersion: 0.018, receptivity: 0.72 },
@@ -35,6 +36,7 @@ export function App() {
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [showControls, setShowControls] = useState(false);
+  const [showSoundtrack, setShowSoundtrack] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [error, setError] = useState("");
   const installation = useMemo(
@@ -54,6 +56,7 @@ export function App() {
     const leave = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setShowControls(false);
+        setShowSoundtrack(false);
       }
     };
     window.addEventListener("keydown", leave);
@@ -174,13 +177,32 @@ export function App() {
         </button>
         <button
           type="button"
-          onClick={() => setShowControls(!showControls)}
+          onClick={() => {
+            setShowControls(!showControls);
+            setShowSoundtrack(false);
+          }}
           aria-expanded={showControls}
           aria-controls="tuning"
         >
           tune {showControls ? "−" : "+"}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowSoundtrack(!showSoundtrack);
+            setShowControls(false);
+          }}
+          aria-expanded={showSoundtrack}
+          aria-controls="soundtrack"
+        >
+          sound {showSoundtrack ? "−" : "+"}
+        </button>
       </div>
+
+      <LocalSoundtrack
+        open={showSoundtrack}
+        onClose={() => setShowSoundtrack(false)}
+      />
 
       {showControls && (
         <aside

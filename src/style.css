@@ -533,3 +533,41 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+.soundtrack[hidden] {
+  display: none;
+}
+.soundtrack audio {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-top: 12px;
+  color-scheme: dark;
+}
+.soundtrack input[type="file"] {
+  width: 100%;
+  min-width: 0;
+  color: #b4a297;
+  font: inherit;
+}
+.soundtrack input[type="file"]::file-selector-button,
+.soundtrack-remove {
+  padding: 10px;
+  margin-right: 8px;
+  border: 1px solid #8b7768;
+  background: #201d1a;
+  color: #fff2e6;
+  font: inherit;
+  cursor: pointer;
+}
+.soundtrack .soundtrack-name {
+  overflow-wrap: anywhere;
+  color: #e5c1b0;
+  margin-top: 12px;
+}
+.soundtrack .soundtrack-intro {
+  margin: 8px 0 16px;
+}
+.soundtrack-remove {
+  margin-top: 12px;
+}
