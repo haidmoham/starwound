@@ -1,5 +1,13 @@
 # Verification ledger
 
+## Concentric field / ragged gash review - 2026-09-30
+
+- Main landing was held when the owner requested a harsher wound and a concentric composition. The original six-point cut was replaced by seeded irregular lips, broken edge light, branching black interruptions, and bounded directional fragments. Centered circular filaments establish order; lower initial trajectory exposure leaves the gash legible against it. The model and event rules are unchanged.
+- Windows Chrome / one Playwright worker: inspected the revised mobile view and tuning at 390 x 844, with document width 390 and no page errors. Clicking `take a still` downloaded a 390 x 844 PNG; visual inspection confirmed the revised star, gash, concentric filaments, and modeled trajectories.
+- Hardware WebGL, context-loss behavior, and physical-phone performance remain unmeasured. The Windows Chrome process used Canvas 2D fallback. Review preview remains the delivery target until the owner reviews the visual checkpoint.
+- Desktop screenshots at 1280 x 800 were inspected at approximately 1 and 12 simulated seconds (opening and disturbance). Diagnostic 120-frame samples reported mobile p99 6 ms / trajectory-draw p95 1.2 ms and desktop p99 6 ms / trajectory-draw p95 1.3 ms. These headless timings are not device refresh-rate promises and the draw metric excludes the separately scheduled backdrop work.
+- Final TypeScript, Oxlint, all 18 model tests, build, and `git diff --check` passed; Vite still reports the existing large-chunk warning.
+
 ## Windows release gate - 2026-09-30
 
 - Reviewed PR #9 at `f6f7d060e2975bd909984b8649be74a49d98b9e8` in an isolated Windows checkout. `npm ci`, `npm run check` (TypeScript, Oxlint, 18 tests), and `npm run build` passed. The existing large-chunk warning remains.

@@ -143,7 +143,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   }
   context.globalAlpha = 1;
 
-  // A small, live ember is present from the first frame. The dark cut is the wound.
+  // Concentric heat gives the torn, seeded gash an order to violate.
   context.save();
   context.translate(centerX, centerY);
   const coreRadius = radius * 0.52;
@@ -156,29 +156,95 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.fillStyle = ember;
   context.globalAlpha = Math.min(1, 0.62 + scene.shock * 0.38);
   context.beginPath();
-  context.arc(0, 0, coreRadius * 1.42, 0, Math.PI * 2);
-  context.fill();
-  context.rotate(-0.44);
-  context.fillStyle = "#030305";
-  context.globalAlpha = 0.9;
-  context.beginPath();
-  context.moveTo(-coreRadius * 1.28, -coreRadius * 0.21);
-  context.lineTo(-coreRadius * 0.18, -coreRadius * 0.08);
-  context.lineTo(coreRadius * 0.22, coreRadius * 0.21);
-  context.lineTo(coreRadius * 1.2, coreRadius * 0.12);
-  context.lineTo(coreRadius * 0.17, coreRadius * 0.42);
-  context.lineTo(-coreRadius * 0.27, coreRadius * 0.09);
+  for (let index = 0; index <= 96; index++) {
+    const angle = (index / 96) * Math.PI * 2;
+    const edge =
+      coreRadius * (1.35 + Math.sin(angle * 13) * 0.045 + next() * 0.09);
+    const x = Math.cos(angle) * edge;
+    const y = Math.sin(angle) * edge;
+    if (index === 0) context.moveTo(x, y);
+    else context.lineTo(x, y);
+  }
   context.closePath();
   context.fill();
-  context.strokeStyle = "#fff0dc";
-  context.globalAlpha = 0.34 + scene.shock * 0.54;
-  context.lineWidth = (1.2 + scene.shock * 1.8) * ratio;
+  // Broken circular filaments remain centered, rather than becoming a decorative fan.
+  for (let ring = 0; ring < 17; ring++) {
+    const ringRadius = coreRadius * (0.43 + ring * 0.12);
+    context.strokeStyle = ring % 3 === 0 ? "#ffe4c9" : "#9c3938";
+    context.globalAlpha = (0.19 + scene.shock * 0.14) * (1 - ring / 23);
+    context.lineWidth = 0.65 * ratio;
+    context.beginPath();
+    context.arc(0, 0, ringRadius, 0, Math.PI * 2);
+    context.stroke();
+  }
+  context.rotate(-0.44);
+  const tear = random(seed ^ 0x75a91c);
+  const upper: [number, number][] = [];
+  const lower: [number, number][] = [];
+  const teeth = detail === 0 ? 38 : 64;
+  for (let index = 0; index <= teeth; index++) {
+    const t = index / teeth;
+    const x = (t * 2 - 1) * coreRadius * 1.38;
+    const envelope = Math.pow(Math.sin(t * Math.PI), 0.62);
+    const spine =
+      coreRadius * (Math.sin(t * 9.3) * 0.055 + Math.sin(t * 24) * 0.028);
+    const bite =
+      (0.12 + tear() * 0.23 + (index % 9 === 2 ? 0.2 : 0)) * envelope;
+    upper.push([x, spine - coreRadius * bite]);
+    lower.push([
+      x + (tear() - 0.5) * coreRadius * 0.05,
+      spine + coreRadius * (0.07 + tear() * 0.15) * envelope,
+    ]);
+  }
+  context.fillStyle = "#030305";
+  context.globalAlpha = 0.98;
   context.beginPath();
-  context.moveTo(-coreRadius * 1.19, -coreRadius * 0.24);
-  context.lineTo(-coreRadius * 0.18, -coreRadius * 0.11);
-  context.lineTo(coreRadius * 0.25, coreRadius * 0.18);
-  context.lineTo(coreRadius * 1.08, coreRadius * 0.09);
-  context.stroke();
+  context.moveTo(...upper[0]);
+  for (const point of upper.slice(1)) context.lineTo(...point);
+  for (const point of [...lower].reverse()) context.lineTo(...point);
+  context.closePath();
+  context.fill();
+  // Light clings to fragments of the lip, never outlines a clean emblem.
+  for (let index = 1; index < upper.length - 1; index++) {
+    if (tear() < 0.38) continue;
+    context.strokeStyle = index % 7 === 0 ? "#fff3df" : "#de7351";
+    context.globalAlpha = 0.28 + tear() * 0.36 + scene.shock * 0.2;
+    context.lineWidth = (0.5 + tear() * 1.6) * ratio;
+    context.beginPath();
+    context.moveTo(...upper[index - 1]);
+    context.lineTo(...upper[index]);
+    context.stroke();
+  }
+  // Branches, torn islands and dragged ink follow the same shear axis.
+  const fragments = detail === 0 ? 48 : detail === 1 ? 90 : 140;
+  for (let index = 0; index < fragments; index++) {
+    const side = index % 3 === 0 ? 1 : -1;
+    const t = tear();
+    const x = (t * 2 - 1) * coreRadius * 1.18;
+    const envelope = Math.sin(t * Math.PI);
+    const y = side * coreRadius * (0.13 + tear() * 0.63) * envelope;
+    const length = coreRadius * (0.035 + tear() * 0.3);
+    const breadth = coreRadius * (0.012 + tear() * 0.065);
+    context.fillStyle =
+      index % 8 === 0 ? "#f3c2a0" : index % 5 === 0 ? "#9f302e" : "#020203";
+    context.globalAlpha = 0.3 + tear() * 0.65;
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + length, y - breadth);
+    context.lineTo(x + length * 0.37, y + breadth * 0.5);
+    context.lineTo(x - length * 0.2, y + breadth);
+    context.closePath();
+    context.fill();
+    if (index % 7 === 0) {
+      context.strokeStyle = "#020203";
+      context.lineWidth = (0.7 + tear() * 2.3) * ratio;
+      context.beginPath();
+      context.moveTo(x, 0);
+      context.lineTo(x + length * 0.5, y * 0.6);
+      context.lineTo(x + length * 0.2, y * 1.3);
+      context.stroke();
+    }
+  }
   context.restore();
   context.globalAlpha = 1;
 

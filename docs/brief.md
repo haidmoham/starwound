@@ -8,6 +8,8 @@ Open directly in the full field. The damaged star is already present, small enou
 
 ## Visual thesis
 
+The owner's later “brutal beauty” direction asks for centered, concentric organization under tension from an irregular gash. The surrounding filaments stay centered; the wound interrupts them with seeded ragged lips, branching black cuts, torn luminous fragments, and debris along a coherent shear axis. The reference to the harsh later style of Tokyo Ghoul:re supplies these high-level qualities only. No manga panels were inspected or copied in this procedural pass.
+
 A wounded ember: pale heat cut by a black fissure, a sparse red corona, asymmetric ejecta, ivory orbital trajectories, a far blue-white point, and black space between them. Violence arrives briefly from a modeled boundary crossing, then recedes. Scar marks persist where subsequent outward crossings occurred. Keep black gaps. Avoid constant flashes, uniform bloom, random shake, generic nebula wallpaper, and black-hole iconography. The brightest marks should have a place and a duration.
 
 The orbital paths are modeled. The star surface, dark wound, distant point, corona, and ejecta are authored presentation around that model, not claims of stellar hydrodynamics or general relativity. Use precise labels when a scientific approximation matters.
