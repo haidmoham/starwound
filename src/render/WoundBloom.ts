@@ -1,3 +1,4 @@
+import { vitalMotion } from "./VitalMotion.ts";
 import type { DetailLevel } from "../core/quality.ts";
 
 type Point = readonly [number, number];
@@ -54,8 +55,18 @@ export function drawWoundBloom(
     const reach =
       radius * (stamen ? 0.44 + pick(2) * 1.4 : 0.26 + pick(2) * 0.7);
     const lean = (pick(3) - 0.65) * radius * 0.72;
-    const bend = Math.sin(time * (0.31 + pick(4) * 0.24) + pick(5) * 9) * 0.045;
-    const extension = 0.85 + shock * 0.8 - pressure * 0.22;
+    const rootMotion = vitalMotion(time, seed);
+    const tipMotion = vitalMotion(time - 0.12 - pick(4) * 0.48, seed);
+    const bend =
+      (tipMotion.breath - rootMotion.breath) * 0.24 +
+      tipMotion.release * (pick(5) - 0.5) * 0.18;
+    const extension =
+      0.85 +
+      shock * 0.5 -
+      pressure * 0.12 +
+      tipMotion.breath * 0.26 -
+      tipMotion.resistance * 0.18 +
+      tipMotion.release * 0.3;
     const tipX = root[0] + lean + radius * bend;
     const tipY = root[1] + side * reach * extension;
     const hook = radius * (0.065 + pick(6) * 0.14);
@@ -79,7 +90,7 @@ export function drawWoundBloom(
     context.moveTo(...root);
     context.bezierCurveTo(
       root[0] + lean * 0.2,
-      root[1] + side * reach * 0.55,
+      root[1] + side * reach * (0.55 - rootMotion.resistance * 0.13),
       tipX - hook,
       tipY - side * hook,
       tipX,
@@ -114,16 +125,14 @@ export function drawWoundBloom(
     }
   }
 
-  // Root-born cohorts follow the same 1.3 rad/s drive onset as the body.
+  // Root-born cohorts escape on the shared labored release, after the lips yield.
+  const releaseMotion = vitalMotion(time, seed);
   const particles = detail === 0 ? 40 : detail === 1 ? 70 : 110;
   for (let index = 0; index < particles; index++) {
     const pick = (channel: number) => sample(seed ^ 0x57b10, index, channel);
     const cohort = index % 6;
-    const period = (Math.PI * 2) / 1.3;
     const age =
-      ((time - Math.PI / 2 / 1.3 + period) % period) -
-      cohort * 0.045 -
-      Math.floor(index / 6) * 0.018;
+      releaseMotion.releaseAge - cohort * 0.045 - Math.floor(index / 6) * 0.018;
     const lifetime = 1.15 + pick(0) * 1.35;
     if (age < 0 || age > lifetime) continue;
     const life = age / lifetime;
@@ -135,7 +144,10 @@ export function drawWoundBloom(
           (0.21 + cohort * 0.088 + (pick(2) - 0.5) * 0.11) * (lip.length - 1),
         )
       ];
-    const speed = radius * (0.2 + pick(3) * 0.57) * (1 + shock * 0.65);
+    const speed =
+      radius *
+      (0.2 + pick(3) * 0.57) *
+      (0.7 + releaseMotion.releaseStrength * 0.65);
     const drift = (pick(4) - 0.62) * speed;
     const x =
       root[0] +
@@ -143,7 +155,8 @@ export function drawWoundBloom(
       Math.sin(age * 3.5 + index) * radius * 0.025 * life;
     const y = root[1] + side * speed * (age - age * age * 0.13);
     const fade = Math.min(1, age / 0.12) * Math.pow(1 - life, 1.6);
-    context.globalAlpha = fade * (0.16 + Math.pow(shock, 1.3) * 0.74);
+    context.globalAlpha =
+      fade * (0.16 + Math.pow(releaseMotion.releaseStrength, 1.3) * 0.57);
     context.strokeStyle =
       index % 7 === 0 ? "#ffd7ab" : index % 3 === 0 ? "#ff6350" : "#ae293a";
     context.lineWidth = (index % 5 === 0 ? 1.3 : 0.65) * pixelRatio;
