@@ -44,7 +44,7 @@ export function drawWoundBloom(
   } = bloom;
   const curls = detail === 0 ? 18 : detail === 1 ? 30 : 44;
   context.save();
-  context.lineCap = "round";
+  context.lineCap = "butt";
   for (let index = 0; index < curls; index++) {
     const pick = (channel: number) => sample(seed, index, channel);
     const side = pick(0) < 0.76 ? -1 : 1;
@@ -60,10 +60,11 @@ export function drawWoundBloom(
     const tipY = root[1] + side * reach * extension;
     const hook = radius * (0.065 + pick(6) * 0.14);
     context.strokeStyle =
-      index % 11 === 0 ? "#ffd0a2" : index % 3 === 0 ? "#e8463b" : "#a92832";
+      index % 11 === 0 ? "#cbb18d" : index % 3 === 0 ? "#b7432e" : "#862e2b";
     context.globalAlpha = 0.35 + pick(7) * 0.27 + shock * 0.22;
     context.lineWidth =
       (stamen ? 0.48 + pick(8) * 0.55 : 1.0 + pick(8) * 1.1) * pixelRatio;
+    context.setLineDash(stamen ? [radius * 0.065, radius * 0.025, radius * 0.012, radius * 0.035] : []);
     context.beginPath();
     context.moveTo(...root);
     context.bezierCurveTo(
@@ -86,6 +87,7 @@ export function drawWoundBloom(
       );
     }
     context.stroke();
+    context.setLineDash([]);
     if (stamen && index % 4 === 1) {
       context.fillStyle = "#f29367";
       context.beginPath();

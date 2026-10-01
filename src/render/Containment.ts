@@ -25,10 +25,28 @@ export function drawContainment(
     context.lineTo(edge + side * size * 0.055, 0);
     context.lineTo(edge + side * size * 0.055, shoulder);
     context.lineTo(edge, shoulder + size * 0.09);
-    context.lineTo(edge, height);
+    for (let chip = 1; chip <= 29; chip++) {
+      const y = shoulder + size * 0.09 + (height - shoulder - size * 0.09) * chip / 29;
+      const bite = (Math.sin(chip * 19.7 + side) * 0.5 + 0.5) * size * 0.009;
+      context.lineTo(edge + side * bite, y);
+    }
     context.lineTo(outer, height);
     context.closePath();
     context.fill();
+    // Fixed dry scuffs belong to the surrounding masses, leaving the void untouched.
+    for (let mark = 0; mark < 65; mark++) {
+      const u = (Math.sin(mark * 45.31 + side * 7) * 43758.5453) % 1;
+      const v = (Math.sin(mark * 13.71 + side * 3) * 19341.117) % 1;
+      const x = outer + (edge - outer) * Math.abs(u);
+      const y = height * Math.abs(v);
+      context.strokeStyle = mark % 4 === 0 ? "#756c52" : "#020202";
+      context.globalAlpha = mark % 4 === 0 ? 0.12 : 0.5;
+      context.lineWidth = mark % 6 === 0 ? size * 0.005 : 0.7;
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + side * size * (0.015 + Math.abs(v) * 0.08), y - size * 0.014);
+      context.stroke();
+    }
     // Reflected wound light touches an edge; it never illuminates the entire chamber.
     context.strokeStyle = shock > 0.25 ? "#bd4b40" : "#5b5360";
     context.globalAlpha = 0.16 + shock * 0.35;

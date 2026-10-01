@@ -8,6 +8,8 @@ Open directly in the full field. The damaged star is already present, small enou
 
 ## Visual thesis
 
+The owner’s Seattle/1990s grunge direction supersedes clean material polish across the entire presentation. The luminous body is scored with seeded charred islands and dry abrasion; the gash has unequal broken teeth; orbital strands are interrupted and frayed, with uneven precession; the monumental planes carry chips and scratches. Dirty bone and bruised red replace pristine ivory. Type carries dry-ink bands, a slight paste-up skew, and a stained typewriter strip; controls use torn paper-like surfaces with readable labels and intact focus outlines. This remains a generative cosmic installation, with damage concentrated in matter and framing rather than uniform full-screen noise.
+
 The Evangelion-inspired pass adds an exterior that feels much larger than the wounded body: unequal, cropped near-black planes and a broken cold incision behind the fixed nucleus. The wound is the only organic warmth inside this rigid space. Its heat is paler and its orbit strands creep for a long held interval before a short continuous release. No camera shake, title cards, copied symbols, characters, or footage are introduced. The surrounding field stays nearly empty.
 
 The newest contrast direction expands the calm void and holds the tangled field in lower light between brief wound-led releases. A smaller luminous body, sparser distant stars, short bright ejecta and fading ember cohorts leave room for ache and distance. This is authored pacing, not yet music-specific choreography.
@@ -19,6 +21,8 @@ A wounded ember: pale heat cut by a black fissure, a sparse red corona, asymmetr
 The original orbital trajectories are modeled. The tangled nuclear filaments and wound-rooted particles are authored presentation. The star surface, dark wound, distant point, corona, and ejecta are authored presentation around that model, not claims of stellar hydrodynamics or general relativity. Use precise labels when a scientific approximation matters.
 
 ## Source transformations
+
+- Seattle grunge: [MOPOP’s Nirvana exhibition](https://www.mopop.org/exhibitions/nirvana-taking-punk-to-the-masses) and its exhibit photograph were inspected for high-contrast printed material, rough reproduction and layered physical surfaces. Exact dates of individual posters in that photograph were not established. Original CSS and seeded Canvas geometry only; no band logo, photograph, font file or poster artwork is copied.
 
 - _Neon Genesis Evangelion_: [Criterion’s illustrated feature](https://www.criterion.com/current/posts/9281-the-inner-worlds-of-neon-genesis-evangelion) and its published stills were inspected. The useful source principles are oppressive framing, stillness, and organic/mechanical tension; the new procedural planes are an original transformation, not a copied scene.
 - _86_: take serious, original inspiration from its emotional restraint, loss, and distance. Do not copy frames, characters, insignia, compositions, audio, or other protected assets.

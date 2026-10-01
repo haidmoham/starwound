@@ -65,7 +65,7 @@ a {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  border-bottom: 1px solid #25231f42;
+  border-bottom: 1px dashed #6e61594f;
   font:
     10px/1.3 ui-monospace,
     SFMono-Regular,
@@ -255,10 +255,11 @@ a {
   top: clamp(92px, 15svh, 160px);
   left: max(24px, 5vw);
   width: min(470px, 45vw);
-  padding-left: 19px;
-  border-left: 2px solid #ac4d4b;
-  color: #eee7df;
-  text-shadow: 0 2px 16px #000;
+  padding-left: 13px;
+  border-left: 3px double #7d392d;
+  color: #c8bd9f;
+  transform: rotate(-1.5deg);
+  transform-origin: left top;
   pointer-events: none;
 }
 .work-title > span {
@@ -270,22 +271,27 @@ a {
   letter-spacing: 0.18em;
 }
 .work-title h1 {
-  margin: 11px 0 9px;
-  font:
-    800 clamp(36px, 5vw, 72px)/0.9 Arial,
-    Helvetica,
-    sans-serif;
-  letter-spacing: -0.075em;
+  margin: 10px 0 12px;
+  font: 900 clamp(36px, 5vw, 72px)/0.92 Impact, "Arial Narrow", sans-serif;
+  letter-spacing: -0.045em;
+  color: #cfc5a8;
+  background: repeating-linear-gradient(174deg, #d6ccb1 0 7px, #756b59 7.5px 8px, #d6ccb1 9px 13px);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(1.2px 0.8px 0 #552c25);
 }
 .work-title h1 span {
   color: #c34643;
 }
 .work-title p {
   margin: 0;
-  color: #b8aaa5;
-  font:
-    italic 13px/1.5 Georgia,
-    serif;
+  display: inline-block;
+  padding: 3px 7px;
+  color: #1a1512;
+  background: #b5aa8d;
+  clip-path: polygon(0 7%, 14% 0, 34% 5%, 65% 0, 100% 9%, 99% 93%, 80% 100%, 39% 94%, 0 100%);
+  font: 11px/1.5 "Courier New", monospace;
 }
 .immersive .study-rail {
   position: fixed;
@@ -309,21 +315,36 @@ a {
   max-width: calc(100% - 28px);
   margin: 0;
   flex-wrap: nowrap;
-  gap: 0;
-  border: 1px solid #f0dbcc4f;
-  background: #110e0ddc;
-  backdrop-filter: blur(18px);
+  gap: 5px;
+  border: 0;
+  background: none;
 }
 .immersive .field-controls button {
   padding: 8px 16px;
   white-space: nowrap;
-  color: #f8e9db;
+  position: relative;
+  isolation: isolate;
+  color: #1c1713;
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+}
+.immersive .field-controls button::before {
+  content: "";
+  position: absolute;
+  inset: 1px 0;
+  z-index: -1;
+  background: repeating-linear-gradient(173deg, #bcb095 0 15px, #9a8f78 16px, #bcb095 17px 25px);
+  clip-path: polygon(0 5%, 21% 1%, 23% 5%, 75% 0, 100% 7%, 98% 91%, 69% 100%, 51% 93%, 0 98%);
+}
+.immersive .field-controls button:nth-child(even)::before {
+  transform: rotate(-1.3deg);
+  background-color: #a59980;
 }
 .immersive .field-controls button + button {
-  border-left: 1px solid #f0dbcc3b;
+  border-left: 0;
 }
 .immersive .field-controls button:hover {
-  color: #ff7750;
+  color: #701f13;
 }
 .tuning {
   position: fixed;
@@ -334,10 +355,10 @@ a {
   max-height: calc(100svh - 150px);
   overflow: auto;
   padding: 18px 20px 20px;
-  border: 1px solid #4a3c33;
-  background: #151413f2;
+  border: 1px dashed #74644d;
+  background: repeating-linear-gradient(177deg, #171512 0 23px, #1e1a15 24px, #171512 26px 43px);
   color: #f4e7d9;
-  box-shadow: 0 18px 60px #0007;
+  box-shadow: 3px 5px 0 #050403;
   font:
     11px ui-monospace,
     SFMono-Regular,

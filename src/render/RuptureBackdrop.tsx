@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { FIXED_DT } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
 import { drawContainment, heldMotion } from "./Containment.ts";
+import { drawScorchedSurface } from "./ScorchedSurface.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
 import { presentationScene, soundtrackCue } from "../media/soundtrackScore.ts";
 import type { SoundtrackClock } from "../media/soundtrackScore.ts";
@@ -173,9 +174,9 @@ function drawRupture(
   context.translate(centerX, centerY);
   const coreRadius = radius * 0.52;
   const ember = context.createRadialGradient(0, 0, 1, 0, 0, coreRadius * 1.42);
-  ember.addColorStop(0, "#fff7e6");
-  ember.addColorStop(0.27, "#ead8ca");
-  ember.addColorStop(0.55, "#af393b");
+  ember.addColorStop(0, "#d9cba9");
+  ember.addColorStop(0.27, "#bba58c");
+  ember.addColorStop(0.55, "#923128");
   ember.addColorStop(0.8, "#501921");
   ember.addColorStop(1, "#020203");
   context.fillStyle = ember;
@@ -183,6 +184,7 @@ function drawRupture(
   context.beginPath();
   context.arc(0, 0, coreRadius * 1.42, 0, Math.PI * 2);
   context.fill();
+  drawScorchedSurface(context, coreRadius, seed, detail, scene.shock);
   // Electron-orbit metaphor only: authored planes share the wounded nucleus.
   // Eccentricity, precession and passing phases differ; the camera never wanders.
   const filament = random(seed ^ 0x32bfa1);
@@ -194,7 +196,7 @@ function drawRupture(
     const rate = (0.045 + filament() * 0.13) * (ring % 2 === 0 ? 1 : -1);
     const offset = filament() * Math.PI * 2;
     const whipPhase = filament() * Math.PI * 2;
-    const angleOfPlane = plane + motion * rate;
+    const angleOfPlane = plane + motion * rate + Math.sin(motion * 1.7 + offset) * 0.055;
     const c = Math.cos(angleOfPlane);
     const sn = Math.sin(angleOfPlane);
     const head = offset + motion * (0.38 + Math.abs(rate) * 4);
@@ -204,31 +206,34 @@ function drawRupture(
         Math.pow(Math.max(0, Math.cos(angle - head)), 12) *
         (0.06 + opening * 0.9);
       const reach =
-        orbitRadius * (1 - pressure * 0.06 + nearPass * 0.085 + whip);
+        orbitRadius *
+        (1 - pressure * 0.06 + nearPass * 0.085 + whip +
+          Math.sin(angle * 19 + whipPhase) * 0.019 +
+          Math.sin(angle * 37 + offset) * 0.008);
       const x = Math.cos(angle) * reach;
       const y = Math.sin(angle) * reach * flatten;
       return [x * c - y * sn, x * sn + y * c];
     };
     context.strokeStyle =
-      ring % 5 === 0 ? "#f7d5b4" : ring % 3 === 0 ? "#ba554b" : "#71383e";
+      ring % 5 === 0 ? "#c7b392" : ring % 3 === 0 ? "#a64c38" : "#623332";
     context.globalAlpha =
       0.07 + (ring % 5 === 0 ? 0.06 : 0) + scene.shock * 0.27;
     context.lineWidth = 0.55 * ratio;
     context.beginPath();
     for (let point = 0; point <= 84; point++) {
       const position = pointAt((point / 84) * Math.PI * 2);
-      if (point === 0) context.moveTo(...position);
+      if (point === 0 || (point + ring * 7) % 13 < 4) context.moveTo(...position);
       else context.lineTo(...position);
     }
     context.stroke();
     // Unequal luminous passages make the tangled planes readable in motion.
-    context.strokeStyle = ring % 4 === 0 ? "#ffe4c5" : "#d55d50";
+    context.strokeStyle = ring % 4 === 0 ? "#d8c29a" : "#b64934";
     context.globalAlpha = 0.16 + scene.shock * 0.36;
     context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
     context.beginPath();
     for (let point = 0; point <= 18; point++) {
       const position = pointAt(head - 0.7 + (point / 18) * 0.7);
-      if (point === 0) context.moveTo(...position);
+      if (point === 0 || (point + ring) % 7 === 0) context.moveTo(...position);
       else context.lineTo(...position);
     }
     context.stroke();
@@ -247,14 +252,15 @@ function drawRupture(
     const spine =
       coreRadius *
       (Math.sin(t * 7.4) * 0.14 +
-        Math.sin(t * 18 + 0.7) * 0.045 -
+        Math.sin(t * 18 + 0.7) * 0.075 +
+        Math.sin(t * 47) * 0.04 -
         shoulder * 0.09 +
         envelope * 0.24);
-    const bite = (0.1 + tear() * 0.095 + shoulder * 0.26 + opening) * envelope;
+    const bite = (0.08 + Math.pow(tear(), 2) * 0.31 + shoulder * 0.26 + opening) * envelope;
     upper.push([x, spine - coreRadius * bite]);
     lower.push([
-      x + (tear() - 0.5) * coreRadius * 0.03,
-      spine + coreRadius * (0.035 + tear() * 0.055 + opening * 0.25) * envelope,
+      x + (tear() - 0.5) * coreRadius * 0.11,
+      spine + coreRadius * (0.015 + tear() * 0.16 + opening * 0.25) * envelope,
     ]);
   }
   context.fillStyle = "#030305";
@@ -267,8 +273,8 @@ function drawRupture(
   context.fill();
   // Light clings to fragments of the lip, never outlines a clean emblem.
   for (let index = 1; index < upper.length - 1; index++) {
-    if (tear() < 0.38) continue;
-    context.strokeStyle = index % 7 === 0 ? "#fff3df" : "#de7351";
+    if (tear() < 0.56) continue;
+    context.strokeStyle = index % 7 === 0 ? "#cabc94" : "#a75336";
     context.globalAlpha = 0.28 + tear() * 0.36 + scene.shock * 0.2;
     context.lineWidth = (0.5 + tear() * 1.6) * ratio;
     context.beginPath();
@@ -287,7 +293,7 @@ function drawRupture(
     const length = coreRadius * (0.035 + tear() * 0.3);
     const breadth = coreRadius * (0.012 + tear() * 0.065);
     context.fillStyle =
-      index % 8 === 0 ? "#f3c2a0" : index % 5 === 0 ? "#9f302e" : "#020203";
+      index % 8 === 0 ? "#bfa585" : index % 5 === 0 ? "#823323" : "#020203";
     context.globalAlpha = 0.3 + tear() * 0.65;
     context.beginPath();
     context.moveTo(x, y);
