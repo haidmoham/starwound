@@ -6,7 +6,7 @@ Read `README.md`, `docs/brief.md`, `docs/architecture.md`, and the assigned issu
 
 ## Preserve the actual project
 
-- The current work opens directly on an autonomous, dying wounded star. There is no entry gate or YouTube companion. The owner now permits optional browser-local soundtrack playback; files must never be uploaded or bundled. No audio-reactive forcing or invented song-specific cues.
+- The current work opens directly on an autonomous, dying wounded star. There is no entry gate or YouTube companion. The latest public experience has no visible text, controls, choices, framing decorations, or music picker. Motion starts immediately; reduced motion remains respected underneath. Never upload or bundle local recordings.
 - Keep the existing React + TypeScript + Vite + Three.js + plain CSS + npm stack. No framework migration, backend, credentials, paid API, or monorepo without a concrete need.
 - This is an art installation in the browser, not a dashboard, equalizer, visualizer, product landing page, or particle preset gallery. The full-field artwork must privilege the image over controls.
 - The world evolves autonomously through a deterministic model. Playback must stay independent of forcing, simulation time, and rendering. Immediate gestures are allowed when their consequences persist in the world.
@@ -18,7 +18,7 @@ Read `README.md`, `docs/brief.md`, `docs/architecture.md`, and the assigned issu
 - Keep forcing, simulation state, history, and rendering separate. React owns controls and lifecycle, not per-particle state or simulation ticks.
 - Keep fixed simulation steps, seeded randomness, bounded buffers, explicit units, and reset semantics. Do not use `Math.random()` inside the model.
 - `FixedClock` is a wall-time preview clock which drops long frames. It is the autonomous world's presentation clock, not a media transport.
-- Controls affecting initial conditions currently restart the study. Clearly distinguish them from live observer controls. Live simulation changes later need a recorded event timeline for replay.
+- The public experience has one fixed initial condition and one integrated body. Do not restore study selectors or tuning controls without a new request.
 - Implement one compelling vertical slice before adding a plugin framework, generic ECS, distributed workers, GPU compute, or more simulation families. Profile before choosing complexity.
 - Dispose GPU resources, animation frames, event listeners, and observers. Respect reduced motion, tab visibility, pause, and keyboard access.
 - For parallel work, use separate branches/worktrees and non-overlapping ownership. Do not change sibling repositories. Never force-push over unrelated work.

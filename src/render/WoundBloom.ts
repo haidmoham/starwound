@@ -42,7 +42,7 @@ export function drawWoundBloom(
     pixelRatio,
     seed,
   } = bloom;
-  const curls = detail === 0 ? 18 : detail === 1 ? 30 : 44;
+  const curls = detail === 0 ? 24 : detail === 1 ? 42 : 58;
   context.save();
   context.lineCap = "butt";
   for (let index = 0; index < curls; index++) {
@@ -52,19 +52,29 @@ export function drawWoundBloom(
     const root = lip[Math.floor((0.18 + pick(1) * 0.62) * (lip.length - 1))];
     const stamen = index % 3 !== 0;
     const reach =
-      radius * (stamen ? 0.32 + pick(2) * 0.83 : 0.18 + pick(2) * 0.46);
+      radius * (stamen ? 0.44 + pick(2) * 1.4 : 0.26 + pick(2) * 0.7);
     const lean = (pick(3) - 0.65) * radius * 0.72;
     const bend = Math.sin(time * (0.31 + pick(4) * 0.24) + pick(5) * 9) * 0.045;
-    const extension = 0.85 + shock * 0.32 - pressure * 0.12;
+    const extension = 0.85 + shock * 0.8 - pressure * 0.22;
     const tipX = root[0] + lean + radius * bend;
     const tipY = root[1] + side * reach * extension;
     const hook = radius * (0.065 + pick(6) * 0.14);
     context.strokeStyle =
-      index % 11 === 0 ? "#cbb18d" : index % 3 === 0 ? "#b7432e" : index % 2 === 0 ? "#89527f" : "#862e2b";
+      index % 11 === 0
+        ? "#cbb18d"
+        : index % 3 === 0
+          ? "#b7432e"
+          : index % 2 === 0
+            ? "#89527f"
+            : "#862e2b";
     context.globalAlpha = 0.35 + pick(7) * 0.27 + shock * 0.22;
     context.lineWidth =
       (stamen ? 0.48 + pick(8) * 0.55 : 1.0 + pick(8) * 1.1) * pixelRatio;
-    context.setLineDash(stamen ? [radius * 0.065, radius * 0.025, radius * 0.012, radius * 0.035] : []);
+    context.setLineDash(
+      stamen
+        ? [radius * 0.065, radius * 0.025, radius * 0.012, radius * 0.035]
+        : [],
+    );
     context.beginPath();
     context.moveTo(...root);
     context.bezierCurveTo(
@@ -104,14 +114,16 @@ export function drawWoundBloom(
     }
   }
 
-  // Six staggered releases; small cohorts detach together rather than constant confetti.
-  const particles = detail === 0 ? 30 : detail === 1 ? 60 : 96;
+  // Root-born cohorts follow the same 1.3 rad/s drive onset as the body.
+  const particles = detail === 0 ? 40 : detail === 1 ? 70 : 110;
   for (let index = 0; index < particles; index++) {
     const pick = (channel: number) => sample(seed ^ 0x57b10, index, channel);
     const cohort = index % 6;
-    const period = 6.7 + cohort * 1.13;
+    const period = (Math.PI * 2) / 1.3;
     const age =
-      ((time + cohort * 1.41) % period) - Math.floor(index / 6) * 0.023;
+      ((time - Math.PI / 2 / 1.3 + period) % period) -
+      cohort * 0.045 -
+      Math.floor(index / 6) * 0.018;
     const lifetime = 1.15 + pick(0) * 1.35;
     if (age < 0 || age > lifetime) continue;
     const life = age / lifetime;

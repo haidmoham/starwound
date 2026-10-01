@@ -1,11 +1,9 @@
 import { useEffect, useRef } from "react";
-import { FIXED_DT } from "../core/clock.ts";
+import { FixedClock } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
-import { drawContainment, heldMotion } from "./Containment.ts";
+import { syntheticForcing } from "../core/forcing.ts";
 import { drawScorchedSurface } from "./ScorchedSurface.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
-import { presentationScene, soundtrackCue } from "../media/soundtrackScore.ts";
-import type { SoundtrackClock } from "../media/soundtrackScore.ts";
 
 function random(seed: number) {
   let state = seed >>> 0;
@@ -15,15 +13,24 @@ function random(seed: number) {
   };
 }
 
-function drawRupture(
-  canvas: HTMLCanvasElement,
-  installation: Installation,
-  soundtrack: SoundtrackClock,
-) {
+function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const seed = installation.world.parameters.seed;
-  const mediaTime = soundtrack.readTime();
-  const phase = mediaTime ?? installation.world.time;
-  const scene = presentationScene(installation.scene(), mediaTime);
+  const phase = installation.world.time;
+  const drive = syntheticForcing(phase);
+  const modeled = installation.scene();
+  const scene = {
+    ...modeled,
+    shock: Math.max(modeled.shock, drive.onset * 0.95),
+  };
+  const positions = installation.world.positions;
+  let load = 0;
+  for (let index = 0; index < positions.length; index += 2) {
+    load += Math.min(
+      1,
+      Math.hypot(positions[index], positions[index + 1]) / 2.4,
+    );
+  }
+  const pressure = drive.energy * 0.65 + (load / (positions.length / 2)) * 0.35;
   const detail = installation.budget.detail;
   const bounds = canvas.getBoundingClientRect();
   const ratio = Math.min(
@@ -40,21 +47,22 @@ function drawRupture(
   const size = Math.min(width, height);
   const centerX = width * 0.5;
   const centerY = height * 0.5;
-  const radius = size * 0.215;
-  const motion = heldMotion(phase);
-  // A long held contraction and short release, anchored to the world's clock.
-  // This is authored pressure, not another physical force or a camera shake.
-  const breath = (phase % 17) / 17;
-  const autonomousPressure =
-    breath < 0.89
-      ? Math.pow(breath / 0.89, 2)
-      : Math.pow((1 - breath) / 0.11, 3);
-  const pressure =
-    mediaTime === null ? autonomousPressure : soundtrackCue(mediaTime).pressure;
-  const opening = scene.shock * 0.24 + pressure * 0.055;
+  const radius = size * 0.3;
+  // One drive feeds contraction, tearing, filaments, light and root-born ejecta.
+  // The field is authored anatomy around the model, not simulated biology.
+  const motion = phase * 0.8 - Math.cos(phase * 1.3) * 0.4;
+  const opening = scene.shock * 0.48 + pressure * 0.11;
 
   context.fillStyle = "#020203";
   context.fillRect(0, 0, width, height);
+  context.save();
+  context.translate(centerX, centerY);
+  context.rotate(Math.sin(phase * 0.22) * 0.08 + scene.shock * 0.16);
+  context.scale(
+    1 - pressure * 0.06 + scene.shock * 0.18,
+    1 - pressure * 0.12 - scene.shock * 0.13,
+  );
+  context.translate(-centerX, -centerY);
   const haze = context.createRadialGradient(
     centerX,
     centerY,
@@ -75,42 +83,12 @@ function drawRupture(
   context.fillRect(0, 0, width, height);
   context.globalAlpha = 1;
 
-  const starDensity = detail === 0 ? 12000 : detail === 1 ? 9000 : 7000;
-  for (
-    let index = 0;
-    index < Math.round((width * height) / starDensity);
-    index++
-  ) {
-    const x = next() * width;
-    const y = next() * height;
-    const distance = Math.hypot(x - centerX, y - centerY);
-    if (distance < radius * 0.75) continue;
-    const cold = next() > 0.92;
-    context.fillStyle = cold ? "#9cc9d6" : "#f2e9d4";
-    context.globalAlpha =
-      (cold ? 0.32 : 0.025 + next() * 0.1) * (0.65 + scene.aftermath * 0.35);
-    const point = (next() > 0.985 ? 1.8 : 0.7) * ratio;
-    context.fillRect(x, y, point, point);
-  }
-  context.globalAlpha = 1;
-  for (let index = 0; index < 17; index++) {
-    const x = next() * width;
-    const y = next() * height;
-    if (Math.hypot(x - centerX, y - centerY) < radius * 0.9) continue;
-    context.fillStyle = index % 5 === 0 ? "#9cc9d6" : "#e5dfd4";
-    context.globalAlpha = 0.15 + next() * 0.22;
-    context.fillRect(x, y, 1.1 * ratio, 1.1 * ratio);
-  }
-  context.globalAlpha = 1;
-
-  drawContainment(context, width, height, scene.shock, pressure);
-
   // The corona is an authored image of a wounded star, not simulated plasma.
   context.save();
   context.translate(centerX, centerY);
   const coronaAlpha = Math.min(
     1,
-    0.12 + scene.shock * 0.88 + scene.aftermath * 0.04,
+    0.22 + scene.shock * 0.78 + scene.aftermath * 0.04,
   );
   const rays = detail === 0 ? 70 : detail === 1 ? 135 : 230;
   for (let index = 0; index < rays; index++) {
@@ -196,7 +174,17 @@ function drawRupture(
     const rate = (0.045 + filament() * 0.13) * (ring % 2 === 0 ? 1 : -1);
     const offset = filament() * Math.PI * 2;
     const whipPhase = filament() * Math.PI * 2;
-    const angleOfPlane = plane + motion * rate + Math.sin(motion * 1.7 + offset) * 0.055;
+    const particle =
+      ((ring * 7) % installation.world.parameters.particleCount) * 2;
+    const strainAngle = Math.atan2(
+      positions[particle + 1],
+      positions[particle],
+    );
+    const angleOfPlane =
+      plane +
+      motion * rate +
+      strainAngle * 0.13 +
+      Math.sin(motion * 1.7 + offset) * 0.055;
     const c = Math.cos(angleOfPlane);
     const sn = Math.sin(angleOfPlane);
     const head = offset + motion * (0.38 + Math.abs(rate) * 4);
@@ -204,10 +192,13 @@ function drawRupture(
       const nearPass = Math.sin(angle * 2 + whipPhase + motion * 0.27);
       const whip =
         Math.pow(Math.max(0, Math.cos(angle - head)), 12) *
-        (0.06 + opening * 0.9);
+        (0.08 + opening * 1.6);
       const reach =
         orbitRadius *
-        (1 - pressure * 0.06 + nearPass * 0.085 + whip +
+        (1 -
+          pressure * 0.06 +
+          nearPass * 0.085 +
+          whip +
           Math.sin(angle * 19 + whipPhase) * 0.019 +
           Math.sin(angle * 37 + offset) * 0.008);
       const x = Math.cos(angle) * reach;
@@ -217,18 +208,20 @@ function drawRupture(
     context.strokeStyle =
       ring % 5 === 0 ? "#c7b392" : ring % 3 === 0 ? "#a64c38" : "#745078";
     context.globalAlpha =
-      0.07 + (ring % 5 === 0 ? 0.06 : 0) + scene.shock * 0.27;
+      0.16 + (ring % 5 === 0 ? 0.12 : 0) + scene.shock * 0.37;
     context.lineWidth = 0.55 * ratio;
     context.beginPath();
     for (let point = 0; point <= 84; point++) {
       const position = pointAt((point / 84) * Math.PI * 2);
-      if (point === 0 || (point + ring * 7) % 13 < 4) context.moveTo(...position);
+      if (point === 0 || (point + ring * 7) % 13 < 4)
+        context.moveTo(...position);
       else context.lineTo(...position);
     }
     context.stroke();
     // Unequal luminous passages make the tangled planes readable in motion.
-    context.strokeStyle = ring % 4 === 0 ? "#d8c29a" : ring % 3 === 0 ? "#92639e" : "#b64934";
-    context.globalAlpha = 0.16 + scene.shock * 0.36;
+    context.strokeStyle =
+      ring % 4 === 0 ? "#d8c29a" : ring % 3 === 0 ? "#92639e" : "#b64934";
+    context.globalAlpha = 0.28 + scene.shock * 0.5;
     context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
     context.beginPath();
     for (let point = 0; point <= 18; point++) {
@@ -256,7 +249,9 @@ function drawRupture(
         Math.sin(t * 47) * 0.04 -
         shoulder * 0.09 +
         envelope * 0.24);
-    const bite = (0.08 + Math.pow(tear(), 2) * 0.31 + shoulder * 0.26 + opening) * envelope;
+    const bite =
+      (0.08 + Math.pow(tear(), 2) * 0.31 + shoulder * 0.26 + opening) *
+      envelope;
     upper.push([x, spine - coreRadius * bite]);
     lower.push([
       x + (tear() - 0.5) * coreRadius * 0.11,
@@ -316,7 +311,7 @@ function drawRupture(
     upper,
     lower,
     radius: coreRadius,
-    time: motion,
+    time: phase,
     pressure,
     shock: scene.shock,
     detail,
@@ -326,116 +321,69 @@ function drawRupture(
   context.restore();
   context.globalAlpha = 1;
 
-  // A distant, nearly unreachable point holds the negative space open.
-  const farX = width * 0.84;
-  const farY = height * 0.31;
-  const farGlow = context.createRadialGradient(
-    farX,
-    farY,
-    0,
-    farX,
-    farY,
-    size * 0.045,
-  );
-  farGlow.addColorStop(0, "#dcecf0");
-  farGlow.addColorStop(0.1, "#789dad");
-  farGlow.addColorStop(1, "#020203");
-  context.fillStyle = farGlow;
-  context.globalAlpha = 0.3 + scene.aftermath * 0.23;
-  context.beginPath();
-  context.arc(farX, farY, size * 0.045, 0, Math.PI * 2);
-  context.fill();
-  context.globalAlpha = 1;
-
-  // Modeled outward crossings leave quiet, bounded scars after the flash.
-  if (
-    mediaTime === null &&
-    scene.ruptureAt !== null &&
-    phase >= scene.ruptureAt
-  ) {
-    const scale = size / 6.2;
-    const project = (x: number, y: number): [number, number] => {
-      const py = y * 0.59;
-      const rx = Math.cos(0.33) * x - Math.sin(0.33) * py;
-      const ry = Math.sin(0.33) * x + Math.cos(0.33) * py;
-      return [centerX + rx * scale, centerY - ry * scale];
-    };
-    for (const event of installation.departures) {
-      const eventTime = event.tick * FIXED_DT;
-      const age = phase - Math.max(scene.ruptureAt, eventTime);
-      if (age < 0) continue;
-      const [x1, y1] = project(event.x, event.y);
-      const [x2, y2] = project(
-        event.x + event.vx * 0.82,
-        event.y + event.vy * 0.82,
-      );
-      const maturity = Math.min(1, age / 1.5);
-      context.strokeStyle = "#020203";
-      context.globalAlpha = maturity * 0.6;
-      context.lineWidth = 3.2 * ratio;
-      context.beginPath();
-      context.moveTo(x1, y1);
-      context.quadraticCurveTo(
-        (x1 + x2) / 2 - 0.05 * size,
-        (y1 + y2) / 2,
-        x2,
-        y2,
-      );
-      context.stroke();
-      context.strokeStyle = event.particle % 7 === 0 ? "#fff1da" : "#e75b3d";
-      context.globalAlpha = maturity * (0.35 + scene.shock * 0.38);
-      context.lineWidth = (event.particle % 7 === 0 ? 1.4 : 1) * ratio;
-      context.beginPath();
-      context.moveTo(x1, y1);
-      context.quadraticCurveTo(
-        (x1 + x2) / 2 - 0.05 * size,
-        (y1 + y2) / 2,
-        x2,
-        y2,
-      );
-      context.stroke();
-    }
-    context.globalAlpha = 1;
-  }
+  context.restore();
 }
 
 export function RuptureBackdrop({
   installation,
-  soundtrack,
+  paused,
 }: {
   installation: Installation;
-  soundtrack: SoundtrackClock;
+  paused: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pausedRef = useRef(paused);
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const clock = new FixedClock();
+    let frame = 0;
+    let previous = performance.now();
     let lastDraw = 0;
     let lastTick = -1;
-    let lastMediaTime: number | null = null;
     let lastDetail = -1;
-    let frame = 0;
-    const render = () => drawRupture(canvas, installation, soundtrack);
+    const profiling = new URLSearchParams(window.location.search).has(
+      "profile",
+    );
+    let lastProfile = installation.budget.stats;
+    const render = () => drawRupture(canvas, installation);
     const observer = new ResizeObserver(render);
     observer.observe(canvas);
     render();
     const animate = (now: number) => {
-      const tick = installation.world.ticks;
-      const mediaTime = soundtrack.readTime();
-      const detail = installation.budget.detail;
-      const fps = detail === 0 ? 10 : detail === 1 ? 16 : 24;
-      if (
-        !document.hidden &&
-        (tick !== lastTick ||
-          detail !== lastDetail ||
-          mediaTime !== lastMediaTime) &&
-        now - lastDraw > 1000 / fps
-      ) {
-        render();
-        lastDraw = now;
-        lastTick = tick;
-        lastMediaTime = mediaTime;
-        lastDetail = detail;
+      const elapsed = Math.max(0, (now - previous) / 1000);
+      previous = now;
+      if (!document.hidden) {
+        if (pausedRef.current) clock.discard();
+        else clock.advance(elapsed, () => installation.step());
+        const start = performance.now();
+        const detail = installation.budget.detail;
+        const fps = detail === 0 ? 16 : detail === 1 ? 24 : 30;
+        if (
+          (installation.world.ticks !== lastTick || detail !== lastDetail) &&
+          now - lastDraw >= 1000 / fps
+        ) {
+          render();
+          lastDraw = now;
+          lastTick = installation.world.ticks;
+          lastDetail = detail;
+        }
+        installation.budget.record(elapsed * 1000, performance.now() - start);
+        if (profiling && installation.budget.stats !== lastProfile) {
+          lastProfile = installation.budget.stats;
+          document.documentElement.dataset.starwoundProfile = JSON.stringify({
+            renderer: "canvas2d-organism",
+            time: installation.world.time,
+            reducedMotion: pausedRef.current,
+            ...lastProfile,
+          });
+        }
+      } else {
+        clock.discard();
+        installation.budget.discard();
       }
       frame = requestAnimationFrame(animate);
     };
@@ -444,7 +392,7 @@ export function RuptureBackdrop({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [installation, soundtrack]);
+  }, [installation]);
   return (
     <canvas className="rupture-backdrop" ref={canvasRef} aria-hidden="true" />
   );
