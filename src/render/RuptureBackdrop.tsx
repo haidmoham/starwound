@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { FIXED_DT } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
+import { drawContainment, heldMotion } from "./Containment.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
 import { presentationScene, soundtrackCue } from "../media/soundtrackScore.ts";
 import type { SoundtrackClock } from "../media/soundtrackScore.ts";
@@ -38,14 +39,15 @@ function drawRupture(
   const size = Math.min(width, height);
   const centerX = width * 0.5;
   const centerY = height * 0.5;
-  const radius = size * 0.195;
+  const radius = size * 0.215;
+  const motion = heldMotion(phase);
   // A long held contraction and short release, anchored to the world's clock.
   // This is authored pressure, not another physical force or a camera shake.
-  const breath = (phase % 13) / 13;
+  const breath = (phase % 17) / 17;
   const autonomousPressure =
-    breath < 0.84
-      ? Math.pow(breath / 0.84, 2)
-      : Math.pow((1 - breath) / 0.16, 3);
+    breath < 0.89
+      ? Math.pow(breath / 0.89, 2)
+      : Math.pow((1 - breath) / 0.11, 3);
   const pressure =
     mediaTime === null ? autonomousPressure : soundtrackCue(mediaTime).pressure;
   const opening = scene.shock * 0.24 + pressure * 0.055;
@@ -85,7 +87,7 @@ function drawRupture(
     const cold = next() > 0.92;
     context.fillStyle = cold ? "#9cc9d6" : "#f2e9d4";
     context.globalAlpha =
-      (cold ? 0.48 : 0.06 + next() * 0.2) * (0.65 + scene.aftermath * 0.35);
+      (cold ? 0.32 : 0.025 + next() * 0.1) * (0.65 + scene.aftermath * 0.35);
     const point = (next() > 0.985 ? 1.8 : 0.7) * ratio;
     context.fillRect(x, y, point, point);
   }
@@ -99,6 +101,8 @@ function drawRupture(
     context.fillRect(x, y, 1.1 * ratio, 1.1 * ratio);
   }
   context.globalAlpha = 1;
+
+  drawContainment(context, width, height, scene.shock, pressure);
 
   // The corona is an authored image of a wounded star, not simulated plasma.
   context.save();
@@ -169,9 +173,9 @@ function drawRupture(
   context.translate(centerX, centerY);
   const coreRadius = radius * 0.52;
   const ember = context.createRadialGradient(0, 0, 1, 0, 0, coreRadius * 1.42);
-  ember.addColorStop(0, "#fff0dc");
-  ember.addColorStop(0.27, "#edab91");
-  ember.addColorStop(0.55, "#bc433f");
+  ember.addColorStop(0, "#fff7e6");
+  ember.addColorStop(0.27, "#ead8ca");
+  ember.addColorStop(0.55, "#af393b");
   ember.addColorStop(0.8, "#501921");
   ember.addColorStop(1, "#020203");
   context.fillStyle = ember;
@@ -190,12 +194,12 @@ function drawRupture(
     const rate = (0.045 + filament() * 0.13) * (ring % 2 === 0 ? 1 : -1);
     const offset = filament() * Math.PI * 2;
     const whipPhase = filament() * Math.PI * 2;
-    const angleOfPlane = plane + phase * rate;
+    const angleOfPlane = plane + motion * rate;
     const c = Math.cos(angleOfPlane);
     const sn = Math.sin(angleOfPlane);
-    const head = offset + phase * (0.38 + Math.abs(rate) * 4);
+    const head = offset + motion * (0.38 + Math.abs(rate) * 4);
     const pointAt = (angle: number): [number, number] => {
-      const nearPass = Math.sin(angle * 2 + whipPhase + phase * 0.27);
+      const nearPass = Math.sin(angle * 2 + whipPhase + motion * 0.27);
       const whip =
         Math.pow(Math.max(0, Math.cos(angle - head)), 12) *
         (0.06 + opening * 0.9);
@@ -306,7 +310,7 @@ function drawRupture(
     upper,
     lower,
     radius: coreRadius,
-    time: phase,
+    time: motion,
     pressure,
     shock: scene.shock,
     detail,

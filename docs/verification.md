@@ -147,3 +147,10 @@ The setup container could not resolve `registry.npmjs.org`; local package-instal
 - No Vercel project, deployment, domain, or secrets were created.
 
 Codex should generate and commit `package-lock.json`, switch CI to `npm ci`, reproduce the checks, inspect the actual browser output, and complete issue #1. Record exact commands and observed outcomes as work progresses.
+
+## 2026-10-01 — severe containment visual pass
+
+- Starting remote PR #9 head verified as `64d3afca41662359b3deb8c21adc81daebc9ae20`; main remains held.
+- Added original monumental asymmetric planes, sparse reflected edges, colder pale core and reduced background stars. Authored strand/petal motion now has a continuous 17-second creep/hold/release cadence. No model, audio transport, fingerprint, cue data, or particle budget change. No new tests.
+- `npm run check` passed TypeScript, Oxlint and all 19 existing tests. `npm run build` passed (777.86 kB JS / 210.38 kB gzip); pre-existing large-chunk warning remains. `git diff --check` passed.
+- Cloud browser visual inspection pending publication. Hardware WebGL and physical-device performance remain unverified.

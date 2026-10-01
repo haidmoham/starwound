@@ -41,3 +41,7 @@ The adaptive budget records 120 visible frame intervals and CPU drawing duration
 ## Release
 
 `vercel.json` owns the static Vite build and routing. GitHub `main` is the Vercel production branch. The two mirrored custom domains have separate DNS and TLS verification. `index.html` revalidates; hashed assets are immutable. See [verification.md](verification.md) for observed results.
+
+## Held presentation
+
+`render/Containment.ts` draws two bounded procedural foreground-scale planes behind the nucleus with sparse reflected edges. `heldMotion` maps each 17-second presentation cycle to slow creep (12% of ordinary motion) plus a smooth release in its last 11%. It is continuous at cycle boundaries, deterministic when seeking, and changes authored orbital/petal phase only. Physical trajectory integration, media transport, and cue timing are untouched. The additional framing uses two fills and three short strokes, independent of adaptive particle density. It shares the existing pause, visibility, resize, and soundtrack clock lifecycle.

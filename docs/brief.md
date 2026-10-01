@@ -8,6 +8,8 @@ Open directly in the full field. The damaged star is already present, small enou
 
 ## Visual thesis
 
+The Evangelion-inspired pass adds an exterior that feels much larger than the wounded body: unequal, cropped near-black planes and a broken cold incision behind the fixed nucleus. The wound is the only organic warmth inside this rigid space. Its heat is paler and its orbit strands creep for a long held interval before a short continuous release. No camera shake, title cards, copied symbols, characters, or footage are introduced. The surrounding field stays nearly empty.
+
 The newest contrast direction expands the calm void and holds the tangled field in lower light between brief wound-led releases. A smaller luminous body, sparser distant stars, short bright ejecta and fading ember cohorts leave room for ache and distance. This is authored pacing, not yet music-specific choreography.
 
 The latest direction keeps the wounded nucleus fixed but makes the surrounding strands much more chaotic: independently tilted and eccentric planes, precession, tightening, near passes, and outward whips. “Electron orbits” is an artistic metaphor, not a physical electron model. The earlier neat concentric loops are superseded. The gash retains unequal seeded lips and held pressure; recurved ribbon-like filaments, longer thin stamens, and small detached ember cohorts grow from its edges. The quiet space around the body remains intact.
@@ -18,6 +20,7 @@ The original orbital trajectories are modeled. The tangled nuclear filaments and
 
 ## Source transformations
 
+- _Neon Genesis Evangelion_: [Criterion’s illustrated feature](https://www.criterion.com/current/posts/9281-the-inner-worlds-of-neon-genesis-evangelion) and its published stills were inspected. The useful source principles are oppressive framing, stillness, and organic/mechanical tension; the new procedural planes are an original transformation, not a copied scene.
 - _86_: take serious, original inspiration from its emotional restraint, loss, and distance. Do not copy frames, characters, insignia, compositions, audio, or other protected assets.
 - Spider-lily influence: [Crunchyroll’s official ED1 page](https://www.youtube.com/watch?v=kSkSvK6Zx_I) was verified, but video frames stalled in the cloud browser. A [Tokyo Ghoul-associated lily still](https://zefirka.club/uploads/posts/2022-09/1662870029_2-zefirka-club-p-tsvetok-gul-oboi-2.jpg) was visually inspected for recurved petals, thin extended stamens, and sparse tips; its exact episode/ending provenance was not verified. The implementation is original procedural geometry. No footage, image assets, or audio were copied.
 - `haidmoham/seaglass`: preserve the useful compact-control discipline, not its entrance or media concept.
