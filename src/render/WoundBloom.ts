@@ -60,7 +60,7 @@ export function drawWoundBloom(
     const tipY = root[1] + side * reach * extension;
     const hook = radius * (0.065 + pick(6) * 0.14);
     context.strokeStyle =
-      index % 11 === 0 ? "#cbb18d" : index % 3 === 0 ? "#b7432e" : "#862e2b";
+      index % 11 === 0 ? "#cbb18d" : index % 3 === 0 ? "#b7432e" : index % 2 === 0 ? "#89527f" : "#862e2b";
     context.globalAlpha = 0.35 + pick(7) * 0.27 + shock * 0.22;
     context.lineWidth =
       (stamen ? 0.48 + pick(8) * 0.55 : 1.0 + pick(8) * 1.1) * pixelRatio;

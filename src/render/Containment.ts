@@ -17,8 +17,8 @@ export function drawContainment(
     const shoulder = height * (side < 0 ? 0.21 : 0.71);
     const face = context.createLinearGradient(outer, 0, edge, 0);
     face.addColorStop(0, "#020204");
-    face.addColorStop(0.82, "#07080b");
-    face.addColorStop(1, side < 0 ? "#111016" : "#0b0d12");
+    face.addColorStop(0.82, "#0d0912");
+    face.addColorStop(1, side < 0 ? "#211628" : "#161020");
     context.fillStyle = face;
     context.beginPath();
     context.moveTo(outer, 0);
@@ -48,7 +48,7 @@ export function drawContainment(
       context.stroke();
     }
     // Reflected wound light touches an edge; it never illuminates the entire chamber.
-    context.strokeStyle = shock > 0.25 ? "#bd4b40" : "#5b5360";
+    context.strokeStyle = shock > 0.25 ? "#bd4b40" : "#79617f";
     context.globalAlpha = 0.16 + shock * 0.35;
     context.lineWidth = Math.max(0.7, size * 0.001);
     context.beginPath();

@@ -157,3 +157,17 @@ Codex should generate and commit `package-lock.json`, switch CI to `npm ci`, rep
 - Cloud Chrome Canvas 2D inspected at 1180 × 757 and 400 × 606. The fixed nucleus remains visible, asymmetric planes read as cropped masses, and narrow controls remain reachable with `scrollWidth = 400`. Freeze held the scene during resize; restart resumed it. Sound drawer opens/closes at narrow width with its own scroll area. Existing audio-file playback tests from the prior pass were not repeated because transport/cue code is unchanged.
 - One cloud desktop sample at high detail showed mean frame interval 16.66 ms and p95 draw work 2.5 ms. This is a bounded observation, not a physical-phone/Mac performance claim. Cloud logs explicitly show WebGL disabled, so all rendered inspection here is the Canvas 2D fallback. Hardware WebGL/context loss and physical-device performance remain unverified.
 - Manual source-level continuity check around 17 seconds returned 16.99999988, 17, and 17.00000012 for phases 16.999999, 17, and 17.000001; no new automated tests were added. Main and production mirrors remain held for visual review.
+
+## 2026-10-01 — whole-presentation grunge revision
+
+- Starting head `fb5e46756d315e7a796cfc18c4596f676946ee94` verified. Published visual code `30a033caa8beb5a16e9f629fc32db883f0469e21` passed GitHub Checks run 36797551256 and Vercel deployment.
+- Body-attached seeded char and fissures interrupt the smooth light; wound teeth are unequal and ragged; orbit paths have stable breaks/angular frays; stamens use dry strokes. Containment planes have bounded scratches/chipped edges. Dirty bone/bruised red palette, dry-ink skewed title, typewriter strip, torn decorative control backgrounds, and stained panels replace pristine UI surfaces. No new library, image/font asset, audio data, or test added.
+- `npm run check`: TypeScript, Oxlint, all 19 existing tests passed. `npm run build` passed: 779.34 kB JS / 210.97 kB gzip, with the existing large-chunk warning. `git diff --check` passed. Deployed script `/assets/index-G3A0dXH5.js` verified in browser.
+- Actual cloud Chrome fallback inspected at 1180 × 757 and 400 × 606. Material changes visible at both widths; all five dock controls readable and reachable. Sound panel opens/closes and scrolls at narrow width; document scrollWidth remained 400. Pause control changed to move. Shared viewport restored and verified at 1180 × 757.
+- A bounded high-detail cloud sample at narrow width recorded mean 16.66 ms frame interval and p95 draw work 2.6 ms. This does not establish physical-phone or 8 GB Mac performance. All rendered QA was Canvas 2D; hardware WebGL/context-loss and physical devices remain unverified. Local-audio transport and cue data were unchanged and playback was not retested in this material-only pass.
+- MOPOP's exhibit image was inspected as reference only; no reference pixels were committed. Main and production mirrors remain held for visual review.
+
+## 2026-10-01 — purple palette and clean type follow-up
+
+- The owner approved the grunged materials but rejected the typography. Restored the earlier restrained sans/monospace type hierarchy and removed the title skew, dry-ink bands and typewriter strip. Torn control backgrounds and damaged matter are retained. Bruised purple now inhabits containment planes, scorched islands, orbit strands and selected wound filaments, with bone/red core contrast intact.
+- Existing check/build and rendered verification recorded below after publication. No model, audio, dependencies or tests changed.

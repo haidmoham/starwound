@@ -45,3 +45,7 @@ The adaptive budget records 120 visible frame intervals and CPU drawing duration
 ## Held presentation
 
 `render/Containment.ts` draws two bounded procedural foreground-scale planes behind the nucleus with sparse reflected edges. `heldMotion` maps each 17-second presentation cycle to slow creep (12% of ordinary motion) plus a smooth release in its last 11%. It is continuous at cycle boundaries, deterministic when seeking, and changes authored orbital/petal phase only. Physical trajectory integration, media transport, and cue timing are untouched. The additional framing uses two fills and three short strokes, independent of adaptive particle density. It shares the existing pause, visibility, resize, and soundtrack clock lifecycle.
+
+## Damaged material presentation
+
+`ScorchedSurface.ts` adds 150/260/380 seeded body-attached abrasion polygons at low/medium/high detail plus 13 coarse fissures. Existing orbital paths now have stable gaps and small angular frays; petal/stamen paths use dry interrupted strokes. The containment planes gain fixed chips and 65 bounded scuffs each. All damage is seeded or index-addressed and derives from the same presented clock, with no model or media changes. The restored clean typography, torn paper-like controls and stained panels use system fonts and static gradients, without imported assets, dependencies, or animated full-screen filters. Focus outlines and button hit areas remain on the unclipped controls; only their decorative pseudo-elements have torn edges.

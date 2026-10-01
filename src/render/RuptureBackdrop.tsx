@@ -63,9 +63,9 @@ function drawRupture(
     centerY,
     radius * 2.1,
   );
-  haze.addColorStop(0, "#170607");
+  haze.addColorStop(0, "#230d2c");
   haze.addColorStop(0.32, "#3b0a0a");
-  haze.addColorStop(0.65, "#16090b");
+  haze.addColorStop(0.65, "#23122d");
   haze.addColorStop(1, "#050506");
   context.fillStyle = haze;
   context.globalAlpha = Math.min(
@@ -119,7 +119,7 @@ function drawRupture(
     const outer = radius * (0.92 + next() * (1.0 + scene.shock));
     const arc = Math.sin(angle * 3 + phase * 0.08) * radius * 0.05;
     context.strokeStyle =
-      index % 9 === 0 ? "#fff0dd" : index % 3 === 0 ? "#d84e42" : "#77333b";
+      index % 9 === 0 ? "#fff0dd" : index % 3 === 0 ? "#d84e42" : "#76517e";
     context.globalAlpha = (0.025 + next() * 0.13) * coronaAlpha;
     context.lineWidth = (index % 9 === 0 ? 1.1 : 0.55) * ratio;
     context.beginPath();
@@ -177,7 +177,7 @@ function drawRupture(
   ember.addColorStop(0, "#d9cba9");
   ember.addColorStop(0.27, "#bba58c");
   ember.addColorStop(0.55, "#923128");
-  ember.addColorStop(0.8, "#501921");
+  ember.addColorStop(0.8, "#452143");
   ember.addColorStop(1, "#020203");
   context.fillStyle = ember;
   context.globalAlpha = Math.min(1, 0.62 + scene.shock * 0.38);
@@ -215,7 +215,7 @@ function drawRupture(
       return [x * c - y * sn, x * sn + y * c];
     };
     context.strokeStyle =
-      ring % 5 === 0 ? "#c7b392" : ring % 3 === 0 ? "#a64c38" : "#623332";
+      ring % 5 === 0 ? "#c7b392" : ring % 3 === 0 ? "#a64c38" : "#745078";
     context.globalAlpha =
       0.07 + (ring % 5 === 0 ? 0.06 : 0) + scene.shock * 0.27;
     context.lineWidth = 0.55 * ratio;
@@ -227,7 +227,7 @@ function drawRupture(
     }
     context.stroke();
     // Unequal luminous passages make the tangled planes readable in motion.
-    context.strokeStyle = ring % 4 === 0 ? "#d8c29a" : "#b64934";
+    context.strokeStyle = ring % 4 === 0 ? "#d8c29a" : ring % 3 === 0 ? "#92639e" : "#b64934";
     context.globalAlpha = 0.16 + scene.shock * 0.36;
     context.lineWidth = (ring % 4 === 0 ? 0.9 : 0.6) * ratio;
     context.beginPath();

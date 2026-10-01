@@ -25,7 +25,7 @@ export function drawScorchedSurface(
     const breadth = radius * (0.006 + next() * 0.055);
     const lean = (next() - 0.7) * radius * 0.12;
     const dry = index % 7 === 0;
-    context.fillStyle = dry ? "#c6b393" : index % 5 === 0 ? "#702b26" : "#080608";
+    context.fillStyle = dry ? "#c6b393" : index % 5 === 0 ? "#593255" : "#100a12";
     context.globalAlpha = dry ? 0.15 + shock * 0.22 : 0.35 + next() * 0.58;
     context.beginPath();
     context.moveTo(x - length, y);
