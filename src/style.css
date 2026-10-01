@@ -584,3 +584,32 @@ a {
 .soundtrack-remove {
   margin-top: 12px;
 }
+
+/* Finish interaction without softening the damaged material. */
+.field-controls button, .study-rail button {
+  transition: color 120ms ease;
+  touch-action: manipulation;
+}
+.immersive .field-controls button[aria-expanded="true"] {
+  color: #512b55;
+}
+.immersive .field-controls button:focus-visible {
+  outline-color: #c29ccc;
+}
+.immersive .field-controls button:active::before {
+  translate: 0 1px;
+}
+.tuning {
+  overscroll-behavior: contain;
+  scrollbar-color: #77647b #171512;
+  scrollbar-width: thin;
+}
+.tuning-head button {
+  min-width: 36px;
+  min-height: 36px;
+}
+@media (max-width: 360px) {
+  .immersive .field-controls { gap: 3px; }
+  .immersive .field-controls button { padding-inline: 3px; letter-spacing: 0; }
+  .work-title h1 { font-size: 32px; }
+}

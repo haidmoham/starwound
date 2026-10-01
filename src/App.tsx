@@ -54,6 +54,9 @@ export function App() {
     }),
     [soundtrack],
   );
+  const tuneButtonRef = useRef<HTMLButtonElement>(null);
+  const soundButtonRef = useRef<HTMLButtonElement>(null);
+  const tuningRef = useRef<HTMLElement>(null);
   const [showControls, setShowControls] = useState(false);
   const [showSoundtrack, setShowSoundtrack] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -76,11 +79,19 @@ export function App() {
       if (event.key === "Escape") {
         setShowControls(false);
         setShowSoundtrack(false);
+        if (showControls) tuneButtonRef.current?.focus();
+        else if (showSoundtrack) soundButtonRef.current?.focus();
       }
     };
     window.addEventListener("keydown", leave);
     return () => window.removeEventListener("keydown", leave);
-  }, []);
+  }, [showControls, showSoundtrack]);
+
+  useEffect(() => {
+    if (showControls) {
+      tuningRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    }
+  }, [showControls]);
 
   const restart = () => {
     setResetKey((value) => value + 1);
@@ -189,14 +200,14 @@ export function App() {
         role="group"
         aria-label="Field controls"
       >
-        <button type="button" onClick={() => setPaused(!paused)}>
+        <button type="button" onClick={() => setPaused((current) => !current)}>
           {paused ? "move ↗" : "freeze Ⅱ"}
         </button>
         <button type="button" onClick={restart}>
-          begin again ↺
+          restart ↺
         </button>
         <button type="button" onClick={saveStill}>
-          take a still ↓
+          save still ↓
         </button>
         <button
           type="button"
@@ -205,6 +216,7 @@ export function App() {
             setShowSoundtrack(false);
           }}
           aria-expanded={showControls}
+          ref={tuneButtonRef}
           aria-controls="tuning"
         >
           tune {showControls ? "−" : "+"}
@@ -216,6 +228,7 @@ export function App() {
             setShowControls(false);
           }}
           aria-expanded={showSoundtrack}
+          ref={soundButtonRef}
           aria-controls="soundtrack"
         >
           sound {showSoundtrack ? "−" : "+"}
@@ -225,11 +238,15 @@ export function App() {
       <LocalSoundtrack
         clock={soundtrack}
         open={showSoundtrack}
-        onClose={() => setShowSoundtrack(false)}
+        onClose={() => {
+          setShowSoundtrack(false);
+          soundButtonRef.current?.focus();
+        }}
       />
 
       {showControls && (
         <aside
+          ref={tuningRef}
           id="tuning"
           className="tuning"
           aria-label="Tune the orbital study"
@@ -238,7 +255,10 @@ export function App() {
             <span>the instrument</span>
             <button
               type="button"
-              onClick={() => setShowControls(false)}
+              onClick={() => {
+                setShowControls(false);
+                tuneButtonRef.current?.focus();
+              }}
               aria-label="close tuning"
             >
               ×

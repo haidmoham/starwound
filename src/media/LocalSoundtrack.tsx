@@ -13,6 +13,10 @@ interface Props {
 export function LocalSoundtrack({ open, onClose, clock }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+  }, [open]);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [matched, setMatched] = useState(false);
@@ -70,7 +74,12 @@ export function LocalSoundtrack({ open, onClose, clock }: Props) {
     >
       <div className="tuning-head">
         <span>sound, if you want it</span>
-        <button type="button" onClick={onClose} aria-label="close soundtrack">
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="close soundtrack"
+        >
           ×
         </button>
       </div>

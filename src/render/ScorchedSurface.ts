@@ -37,6 +37,8 @@ export function drawScorchedSurface(
     context.closePath();
     context.fill();
   }
+  // A separate seed keeps major fissures fixed when adaptive detail changes.
+  state = (seed ^ 0x4dca13) >>> 0;
   // Broad charred fissures break the airbrushed disc into unequal islands.
   for (let index = 0; index < 13; index++) {
     const x = (next() * 2 - 1) * radius;

@@ -170,4 +170,5 @@ Codex should generate and commit `package-lock.json`, switch CI to `npm ci`, rep
 ## 2026-10-01 — purple palette and clean type follow-up
 
 - The owner approved the grunged materials but rejected the typography. Restored the earlier restrained sans/monospace type hierarchy and removed the title skew, dry-ink bands and typewriter strip. Torn control backgrounds and damaged matter are retained. Bruised purple now inhabits containment planes, scorched islands, orbit strands and selected wound filaments, with bone/red core contrast intact.
-- Existing check/build and rendered verification recorded below after publication. No model, audio, dependencies or tests changed.
+- Finishing pass also restores panel focus on close/Escape, focuses opened panels, shortens restart/still labels for small screens, improves active/focus/scroll treatment and stabilizes major scorched fissures across detail changes.
+- `npm run check` passed TypeScript, Oxlint and all 19 existing tests. Build passed at 779.71 kB JS / 211.08 kB gzip, retaining the existing large-chunk warning. No model, audio transport, dependencies or tests changed. Rendered verification follows publication.
