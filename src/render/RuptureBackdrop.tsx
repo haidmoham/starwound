@@ -74,7 +74,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   haze.addColorStop(0, "#230d2c");
   haze.addColorStop(0.32, "#3b0a0a");
   haze.addColorStop(0.65, "#23122d");
-  haze.addColorStop(1, "#050506");
+  haze.addColorStop(1, "rgba(2, 2, 3, 0)");
   context.fillStyle = haze;
   context.globalAlpha = Math.min(
     1,
