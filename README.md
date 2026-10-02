@@ -1,8 +1,10 @@
 # Starwound
 
-One wounded being in the void. It opens directly into motion with no visible text, menus, options, decorative framing, or audio picker. Purple bruising, charred matter, a brutal irregular gash, living filaments and root-born ejecta inhabit one fixed nucleus.
+One wounded being in the void. It opens directly into motion with no visible copy, menus, decorative framing, or audio picker. Purple bruising, charred matter, a brutal irregular gash, living filaments and root-born ejecta inhabit one fixed nucleus. A restrained camera drifts through the quiet field without disturbing the body's own anchor.
 
-The entire public artwork is one Canvas 2D field. One seeded, fixed-step particle world and its autonomous drive feed the body's pressure, contraction, tearing and release. The anatomy is authored generative art, not a simulated biological organism or relativistic star. Reduced-motion preferences hold the image still; hidden tabs suspend progression and resume without catch-up.
+The entire public artwork is one Canvas 2D field. One seeded, fixed-step particle world and its autonomous drive feed the body's pressure, contraction, tearing and release. The anatomy is authored generative art, not a simulated biological organism or relativistic star. Reduced-motion preferences hold the image and camera still; hidden tabs suspend progression and resume without catch-up.
+
+The quiet sound icon starts an original ominous ambient bed, generated locally with Web Audio. Sound is off until a deliberate click or keyboard activation, fades in gently, and can be muted with the same control. Hidden tabs suspend the sound too. No recording, external audio service or uploaded file is involved; the artwork remains complete in silence.
 
 ## Development
 
@@ -17,6 +19,6 @@ npm run build
 
 Rendering detail, pixel density and redraw rate adapt within bounded budgets without altering fixed simulation steps. `?profile=1` exposes rolling frame/draw statistics through `document.documentElement.dataset.starwoundProfile`. Cloud measurements do not establish physical-device performance.
 
-Main and production mirrors are held for visual review. The owner's `starwound.x.dev` shorthand means both `starwound.shin86.dev` and `starwound.mhaider.dev`.
+The owner approved the reviewed installation for landing on October 2, 2026. Production mirrors are `starwound.shin86.dev` and `starwound.mhaider.dev`; verify each host separately. Remaining work is tracked in [todo.md](todo.md).
 
 See [brief](docs/brief.md), [architecture](docs/architecture.md), and the chronological [verification ledger](docs/verification.md).

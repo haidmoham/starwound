@@ -2,9 +2,17 @@
 
 ## One public body
 
-`App.tsx` creates one `Installation` with a fixed seed/initial condition and renders only `RuptureBackdrop`. It observes `prefers-reduced-motion`; there are no public controls, visible text, audio elements, or decorative layers.
+`App.tsx` creates one `Installation` with a fixed seed/initial condition and renders `RuptureBackdrop` plus one accessible sound toggle. It observes `prefers-reduced-motion`; there is no visible copy, menu, audio-file picker, or decorative layer.
 
-`RuptureBackdrop.tsx` owns the sole animation loop, fixed clock, adaptive budget and Canvas 2D field. The clock advances `Installation` at 120 Hz. A hidden tab discards elapsed time rather than catching up. Reduced motion discards clock progression and draws the held body. Resize redraws without recreating the model. Animation frames, media-query listeners and resize observers are cleaned up.
+`RuptureBackdrop.tsx` owns the sole animation loop, fixed clock, adaptive budget and Canvas 2D field. The clock advances `Installation` at 120 Hz. Visibility transitions reset wall time and discard accumulated time rather than catching up. Reduced motion discards clock progression and draws the held body. Resize redraws without recreating the model. Animation frames, media-query and visibility listeners, and resize observers are cleaned up.
+
+`CameraDrift.ts` samples a slow observer translation and a maximum 3.6% change of scale from simulation time. The original centered view is preserved at time zero. Translation stays within 7.5% horizontally and 3.5% vertically of the smaller viewport dimension. It affects the complete drawing, never model coordinates or anatomical relationships; reduced motion and hidden tabs hold the same camera position.
+
+## Optional original sound
+
+`AmbientSound.tsx` is a keyboard-accessible, labeled icon toggle. `ambientBed.ts` creates its native Web Audio graph only after deliberate activation, provides a quiet gradual entrance and mute, and suspends when the page is hidden. Original synthesized tones and filtered noise form an evolving ominous bed without an external recording or service. Sound is independent of model forcing and simulation time; no soundtrack-synchronization claim is made. Unmount disposes the graph and its sources.
+
+Music playback requests the optional Audio Session `playback` type before context creation/resume, and restores the previous type when muted, hidden or disposed. Requested intent, pending startup and confirmed playback are separate. An unexpected foreground context interruption clears the active icon and allows a fresh gesture retry. A four-second unresolved resume returns to a retryable off state; late completion cannot unmute it. With `?profile=1`, `data-starwound-audio` contains context state/time, the requested session type and post-master PCM RMS/peak. These samples diagnose generated signal, not physical speaker audibility.
 
 ## Shared causality
 
@@ -22,4 +30,4 @@ The public entry point no longer imports the separate WebGL trajectory renderer,
 
 ## Release
 
-Vercel previews follow the feature branch. Main and production mirrors remain held for visual review. No user audio or reference artwork is bundled. See the chronological verification ledger for observed evidence and historical renderer limits.
+Vercel previews follow feature branches; production follows main and mirrors the installation at `starwound.shin86.dev` and `starwound.mhaider.dev`. The owner approved landing the reviewed installation on October 2, 2026. No user audio or reference artwork is bundled. See the chronological verification ledger for observed evidence and historical renderer limits.
