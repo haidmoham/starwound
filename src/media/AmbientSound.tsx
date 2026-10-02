@@ -7,19 +7,31 @@ export function AmbientSound() {
   const requestRef = useRef(0);
   const [enabled, setEnabled] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   useEffect(() => {
+    const profiling = new URLSearchParams(window.location.search).has("profile");
     const bed = createAmbientBed({
       onEnabledChange: (value) => {
+        if (bedRef.current === bed && !value) setEnabled(false);
+      },
+      onPlaybackChange: (value) => {
         if (bedRef.current === bed) setEnabled(value);
       },
+      inspectOutput: profiling,
     });
     bedRef.current = bed;
     const visibilityChanged = () => bed.setVisible(!document.hidden);
     visibilityChanged();
     document.addEventListener("visibilitychange", visibilityChanged);
+    const inspect = () => {
+      document.documentElement.dataset.starwoundAudio = JSON.stringify(bed.inspect());
+    };
+    const profileTimer = profiling ? window.setInterval(inspect, 250) : undefined;
     return () => {
       document.removeEventListener("visibilitychange", visibilityChanged);
+      if (profileTimer !== undefined) window.clearInterval(profileTimer);
+      if (profiling) delete document.documentElement.dataset.starwoundAudio;
       requestRef.current += 1;
       bedRef.current = null;
       bed.dispose();
@@ -32,22 +44,24 @@ export function AmbientSound() {
     const request = ++requestRef.current;
     const next = !bed.enabled;
     setFailed(false);
-    setEnabled(next);
+    setStarting(next);
     try {
       const active = await bed.setEnabled(next);
       if (bedRef.current === bed && requestRef.current === request) {
-        setEnabled(bed.enabled);
+        setStarting(false);
+        setEnabled(bed.playing);
         setFailed(next && !active && !bed.enabled);
       }
     } catch {
       if (bedRef.current === bed && requestRef.current === request) {
         setEnabled(false);
+        setStarting(false);
         setFailed(true);
       }
     }
   };
 
-  const label = failed
+  const label = starting ? "Cancel starting ambient sound" : failed
     ? "Sound unavailable. Try ambient sound again"
     : enabled
       ? "Mute ambient sound"
@@ -61,6 +75,7 @@ export function AmbientSound() {
         onClick={() => void toggle()}
         aria-label={label}
         aria-pressed={enabled}
+        aria-busy={starting}
         title={label}
       >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

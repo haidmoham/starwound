@@ -2,10 +2,16 @@ export interface AmbientBedOptions {
   /** Called only by setEnabled(true), never by construction or visibility. */
   createContext?: () => AudioContext;
   onEnabledChange?: (enabled: boolean) => void;
+  onPlaybackChange?: (playing: boolean) => void;
+  /** Optional platform music-routing API (supported by iOS Safari). */
+  audioSession?: { type: string };
+  inspectOutput?: boolean;
 }
 
 export interface AmbientBed {
   readonly enabled: boolean;
+  readonly playing: boolean;
+  inspect(): { state: string; time: number; rms: number | null; peak: number | null; session: string };
   /** Call directly from a user gesture, not from a React effect. */
   setEnabled(enabled: boolean): Promise<boolean>;
   /** Hiding preserves the user's choice but suspends the audio clock. */
@@ -20,11 +26,12 @@ const FADE_OUT_SECONDS = 0.14;
 interface SoundGraph {
   context: AudioContext;
   master: GainNode;
+  measure(): { rms: number; peak: number } | null;
   release(): void;
 }
 
 /** Original D-minor/flat-second drone; no recordings or media/model inputs. */
-function buildGraph(context: AudioContext): SoundGraph {
+function buildGraph(context: AudioContext, inspectOutput: boolean): SoundGraph {
   const nodes: AudioNode[] = [];
   const sources: AudioScheduledSourceNode[] = [];
   const own = <T extends AudioNode>(node: T): T => {
@@ -53,6 +60,23 @@ function buildGraph(context: AudioContext): SoundGraph {
     const master = own(context.createGain());
     master.gain.value = 0;
     master.connect(context.destination);
+    const analyser = inspectOutput ? own(context.createAnalyser()) : null;
+    if (analyser) {
+      analyser.fftSize = 2048;
+      master.connect(analyser);
+    }
+    const samplesOut = analyser ? new Float32Array(analyser.fftSize) : null;
+    const measure = () => {
+      if (!analyser || !samplesOut) return null;
+      analyser.getFloatTimeDomainData(samplesOut);
+      let square = 0;
+      let peak = 0;
+      for (const sample of samplesOut) {
+        square += sample * sample;
+        peak = Math.max(peak, Math.abs(sample));
+      }
+      return { rms: Math.sqrt(square / samplesOut.length), peak };
+    };
 
     const lowCut = own(context.createBiquadFilter());
     lowCut.type = "highpass";
@@ -146,7 +170,7 @@ function buildGraph(context: AudioContext): SoundGraph {
     modulate(airGain.gain, 0.037, 0.009);
     start(noise);
 
-    return { context, master, release };
+    return { context, master, measure, release };
   } catch (error) {
     release();
     throw error;
@@ -161,11 +185,41 @@ function buildGraph(context: AudioContext): SoundGraph {
 export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
   let graph: SoundGraph | null = null;
   let enabled = false;
+  let playing = false;
   let visible = true;
   let disposed = false;
   let revision = 0;
   let suspendTimer: ReturnType<typeof setTimeout> | undefined;
   let envelope = { from: 0, to: 0, start: 0, end: 0 };
+  let claimedSession: { session: { type: string }; previous: string } | null = null;
+  let removeStateListener = () => {};
+  let pendingResume: number | null = null;
+  let suspending = 0;
+  const pendingStarts = new Set<() => void>();
+
+  const claimPlaybackSession = () => {
+    try {
+      const session = options.audioSession ??
+        (typeof navigator === "undefined" ? undefined :
+          (navigator as Navigator & { audioSession?: { type: string } }).audioSession);
+      if (!session || claimedSession) return;
+      const previous = session.type;
+      session.type = "playback";
+      claimedSession = { session, previous };
+    } catch {
+      // This optional API is not available in every browser/embedded view.
+    }
+  };
+  const releasePlaybackSession = () => {
+    const claim = claimedSession;
+    claimedSession = null;
+    if (!claim) return;
+    try {
+      if (claim.session.type === "playback") claim.session.type = claim.previous;
+    } catch {
+      // A platform routing failure must not prevent muting or disposal.
+    }
+  };
 
   const shouldPlay = () => enabled && visible && !disposed;
   const clearSuspendTimer = () => {
@@ -176,6 +230,11 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
     if (enabled === value) return;
     enabled = value;
     options.onEnabledChange?.(value);
+  };
+  const changePlaying = (value: boolean) => {
+    if (playing === value) return;
+    playing = value;
+    options.onPlaybackChange?.(value);
   };
   const ramp = (target: number, seconds: number) => {
     if (!graph || graph.context.state === "closed") return;
@@ -198,16 +257,26 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
   const suspend = (ticket: number) => {
     const current = graph;
     if (!current || disposed || ticket !== revision || shouldPlay()) return;
-    if (current.context.state === "closed") return;
+    changePlaying(false);
+    if (current.context.state === "closed") {
+      releasePlaybackSession();
+      return;
+    }
+    suspending += 1;
     void current.context.suspend().then(
       () => {
+        suspending -= 1;
         // An enable/visibility gesture may have overtaken an in-flight suspend.
         if (current === graph && shouldPlay() && current.context.state !== "running") {
           void resume(revision);
+        } else if (!shouldPlay()) {
+          releasePlaybackSession();
         }
       },
       () => {
+        suspending -= 1;
         // Gain is already zero even if the browser cannot suspend its device.
+        if (!shouldPlay()) releasePlaybackSession();
       },
     );
   };
@@ -219,13 +288,18 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
       if (current === graph && ticket === revision && !disposed) {
         ramp(0, 0);
         changeEnabled(false);
+        changePlaying(false);
+        releasePlaybackSession();
         suspend(ticket);
       }
       return enabled;
     };
     try {
+      claimPlaybackSession();
+      pendingResume = ticket;
       // Do not defer this call into a promise queue: that loses user activation.
-      return current.context.resume().then(() => {
+      const resumed = current.context.resume();
+      const result = resumed.then(() => {
         if (disposed || current !== graph) return false;
         if (!shouldPlay()) {
           ramp(0, 0);
@@ -233,10 +307,31 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
         } else if (ticket === revision) {
           if (current.context.state !== "running") return failed();
           ramp(LISTENING_GAIN, FADE_IN_SECONDS);
+          changePlaying(true);
         }
         return enabled;
       }, failed);
+      return new Promise<boolean>((resolve) => {
+        const cancel = () => {
+          clearTimeout(timeout);
+          pendingStarts.delete(cancel);
+          resolve(false);
+        };
+        const timeout = setTimeout(() => {
+          pendingStarts.delete(cancel);
+          if (pendingResume === ticket) pendingResume = null;
+          resolve(failed());
+        }, 4000);
+        pendingStarts.add(cancel);
+        void result.then((value) => {
+          clearTimeout(timeout);
+          pendingStarts.delete(cancel);
+          if (pendingResume === ticket) pendingResume = null;
+          resolve(value);
+        });
+      });
     } catch {
+      if (pendingResume === ticket) pendingResume = null;
       return Promise.resolve(failed());
     }
   };
@@ -245,12 +340,22 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
     get enabled() {
       return enabled;
     },
+    get playing() {
+      return playing;
+    },
+    inspect() {
+      const signal = graph?.measure();
+      return { state: graph?.context.state ?? "idle", time: graph?.context.currentTime ?? 0,
+        rms: signal?.rms ?? null, peak: signal?.peak ?? null,
+        session: claimedSession?.session.type ?? "default" };
+    },
     setEnabled(value) {
       if (disposed) return Promise.resolve(false);
       const ticket = ++revision;
       clearSuspendTimer();
       changeEnabled(value);
       if (!value) {
+        changePlaying(false);
         ramp(0, FADE_OUT_SECONDS);
         if (graph) {
           suspendTimer = setTimeout(() => {
@@ -260,14 +365,38 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
         }
         return Promise.resolve(false);
       }
+      claimPlaybackSession();
+      if (graph?.context.state === "closed") {
+        removeStateListener();
+        graph.release();
+        graph = null;
+      }
       if (!graph) {
         let context: AudioContext | undefined;
         try {
           context = options.createContext?.() ?? new AudioContext();
-          graph = buildGraph(context);
+          graph = buildGraph(context, options.inspectOutput ?? false);
+          const observed = graph;
+          const stateChanged = () => {
+            if (disposed || graph !== observed) return;
+            if (observed.context.state !== "running") {
+              changePlaying(false);
+              // An OS interruption can happen without document.hidden changing.
+              // Show a retryable off state instead of an indefinitely lit icon.
+              if (visible && enabled && pendingResume === null && suspending === 0) {
+                changeEnabled(false);
+                ramp(0, 0);
+                releasePlaybackSession();
+                suspend(++revision);
+              }
+            }
+          };
+          context.addEventListener("statechange", stateChanged);
+          removeStateListener = () => context?.removeEventListener("statechange", stateChanged);
         } catch {
           if (context) close(context);
           changeEnabled(false);
+          releasePlaybackSession();
           return Promise.resolve(false);
         }
       }
@@ -295,8 +424,13 @@ export function createAmbientBed(options: AmbientBedOptions = {}): AmbientBed {
       if (disposed) return;
       disposed = true;
       enabled = false;
+      playing = false;
       revision += 1;
       clearSuspendTimer();
+      for (const cancel of pendingStarts) cancel();
+      pendingStarts.clear();
+      removeStateListener();
+      releasePlaybackSession();
       if (!graph) return;
       ramp(0, 0);
       const current = graph;

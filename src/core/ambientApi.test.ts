@@ -58,12 +58,22 @@ class FakeContext {
   closes = 0;
   nextResume: Promise<void> | undefined;
   nextSuspend: Promise<void> | undefined;
+  listeners = new Set<() => void>();
+  addEventListener(_type: string, listener: () => void) { this.listeners.add(listener); }
+  removeEventListener(_type: string, listener: () => void) { this.listeners.delete(listener); }
+  interrupt() {
+    this.state = "interrupted";
+    for (const listener of this.listeners) listener();
+  }
   resume() {
     this.resumes += 1;
     const pending = this.nextResume ?? Promise.resolve();
     this.nextResume = undefined;
     return pending.then(() => {
-      if (this.state !== "closed") this.state = "running";
+      if (this.state !== "closed") {
+        this.state = "running";
+        for (const listener of this.listeners) listener();
+      }
     });
   }
   suspend() {
@@ -71,7 +81,10 @@ class FakeContext {
     const pending = this.nextSuspend ?? Promise.resolve();
     this.nextSuspend = undefined;
     return pending.then(() => {
-      if (this.state !== "closed") this.state = "suspended";
+      if (this.state !== "closed") {
+        this.state = "suspended";
+        for (const listener of this.listeners) listener();
+      }
     });
   }
   close() {
@@ -239,5 +252,89 @@ test("a failed context factory is recoverable on a later gesture", async () => {
   assert.equal(await bed.setEnabled(true), false);
   assert.equal(await bed.setEnabled(true), true);
   assert.equal(creates, 2);
+  bed.dispose();
+});
+
+test("music requests the playback session before creating its AudioContext", async () => {
+  const session = { type: "auto" };
+  const context = new FakeContext();
+  const bed = createAmbientBed({
+    audioSession: session,
+    createContext: () => {
+      assert.equal(session.type, "playback");
+      return context.asAudioContext();
+    },
+  });
+  assert.equal(session.type, "auto", "mounting must not take audio focus");
+  assert.equal(await bed.setEnabled(true), true);
+  assert.equal(context.state, "running");
+  bed.setVisible(false);
+  await flush();
+  assert.equal(session.type, "auto");
+  bed.setVisible(true);
+  await flush();
+  assert.equal(session.type, "playback");
+  bed.dispose();
+  assert.equal(session.type, "auto");
+});
+
+test("an interrupted foreground context clears confirmed playback and can retry by gesture", async () => {
+  const context = new FakeContext();
+  const playing: boolean[] = [];
+  const bed = createAmbientBed({ createContext: () => context.asAudioContext(),
+    onPlaybackChange: (value) => playing.push(value) });
+  await bed.setEnabled(true);
+  assert.equal(bed.playing, true);
+  context.interrupt();
+  assert.equal(bed.playing, false);
+  assert.equal(bed.enabled, false);
+  assert.equal(context.nodes[0].gain.value, 0);
+  await flush();
+  await context.resume();
+  assert.equal(bed.playing, false, "automatic OS resume must not light an off icon");
+  assert.equal(context.nodes[0].gain.value, 0, "automatic OS resume must remain muted");
+  assert.equal(await bed.setEnabled(true), true);
+  assert.equal(bed.playing, true);
+  assert.deepEqual(playing, [true, false, true]);
+  bed.dispose();
+  assert.equal(context.listeners.size, 0);
+});
+
+test("a stalled startup never confirms playback, times out, and cannot later unmute", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const context = new FakeContext();
+  const pending = deferred();
+  context.nextResume = pending.promise;
+  const bed = createAmbientBed({ createContext: () => context.asAudioContext() });
+  const start = bed.setEnabled(true);
+  assert.equal(bed.playing, false);
+  t.mock.timers.tick(4000);
+  assert.equal(await start, false);
+  assert.equal(bed.enabled, false);
+  pending.resolve();
+  await flush();
+  assert.equal(bed.playing, false);
+  assert.equal(context.nodes[0].gain.value, 0);
+  bed.dispose();
+});
+
+test("disposing a stalled startup settles the request without leaving a timer", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const context = new FakeContext();
+  context.nextResume = deferred().promise;
+  const bed = createAmbientBed({ createContext: () => context.asAudioContext() });
+  const start = bed.setEnabled(true);
+  bed.dispose();
+  assert.equal(await start, false);
+  t.mock.timers.tick(4000);
+  assert.equal(context.closes, 1);
+});
+
+test("unsupported playback-session setters do not prevent ordinary browser audio", async () => {
+  const context = new FakeContext();
+  const session = { get type() { return "auto"; }, set type(_value: string) { throw new Error("unsupported"); } };
+  const bed = createAmbientBed({ audioSession: session, createContext: () => context.asAudioContext() });
+  assert.equal(await bed.setEnabled(true), true);
+  assert.equal(bed.playing, true);
   bed.dispose();
 });
