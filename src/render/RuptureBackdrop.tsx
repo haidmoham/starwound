@@ -3,7 +3,9 @@ import { FixedClock } from "../core/clock.ts";
 import { Installation } from "../core/installation.ts";
 import { syntheticForcing } from "../core/forcing.ts";
 import { drawScorchedSurface } from "./ScorchedSurface.ts";
+import { vitalMotion } from "./VitalMotion.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
+import { cameraDrift } from "./CameraDrift.ts";
 
 function random(seed: number) {
   let state = seed >>> 0;
@@ -17,10 +19,14 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const seed = installation.world.parameters.seed;
   const phase = installation.world.time;
   const drive = syntheticForcing(phase);
+  const vital = vitalMotion(phase, seed);
   const modeled = installation.scene();
   const scene = {
     ...modeled,
-    shock: Math.max(modeled.shock, drive.onset * 0.95),
+    shock: Math.min(
+      1,
+      modeled.shock * 0.55 + vital.release * 0.68 + vital.pulse * 0.22,
+    ),
   };
   const positions = installation.world.positions;
   let load = 0;
@@ -48,19 +54,40 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const centerX = width * 0.5;
   const centerY = height * 0.5;
   const radius = size * 0.3;
-  // One drive feeds contraction, tearing, filaments, light and root-born ejecta.
+  // One effort envelope feeds contraction, tearing, filaments, light and ejecta.
   // The field is authored anatomy around the model, not simulated biology.
-  const motion = phase * 0.8 - Math.cos(phase * 1.3) * 0.4;
-  const opening = scene.shock * 0.48 + pressure * 0.11;
+  const motion = vital.travel;
+  const opening =
+    scene.shock * 0.37 +
+    vital.resistance * 0.19 +
+    vital.breath * 0.07 +
+    pressure * 0.05;
 
   context.fillStyle = "#020203";
   context.fillRect(0, 0, width, height);
   context.save();
+  // Move the observer through the quiet field, never the body's own anchor.
+  // The whole anatomy shares this restrained camera; there is no shake.
+  const camera = cameraDrift(phase);
+  context.translate(centerX - camera.x * size, centerY - camera.y * size);
+  context.scale(camera.scale, camera.scale);
+  context.translate(-centerX, -centerY);
   context.translate(centerX, centerY);
-  context.rotate(Math.sin(phase * 0.22) * 0.08 + scene.shock * 0.16);
+  context.rotate(
+    vital.resistance * 0.09 - vital.breath * 0.035 + vital.release * 0.08,
+  );
   context.scale(
-    1 - pressure * 0.06 + scene.shock * 0.18,
-    1 - pressure * 0.12 - scene.shock * 0.13,
+    1 -
+      pressure * 0.025 +
+      vital.breath * 0.13 -
+      vital.resistance * 0.08 +
+      vital.pulse * 0.022 +
+      scene.shock * 0.11,
+    1 -
+      pressure * 0.04 +
+      vital.breath * 0.055 -
+      vital.resistance * 0.095 -
+      scene.shock * 0.09,
   );
   context.translate(-centerX, -centerY);
   const haze = context.createRadialGradient(
@@ -95,7 +122,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     const angle = next() * Math.PI * 2;
     const inner = radius * (0.37 + next() * 0.4);
     const outer = radius * (0.92 + next() * (1.0 + scene.shock));
-    const arc = Math.sin(angle * 3 + phase * 0.08) * radius * 0.05;
+    const arc = Math.sin(angle * 3 + motion * 0.08) * radius * 0.05;
     context.strokeStyle =
       index % 9 === 0 ? "#fff0dd" : index % 3 === 0 ? "#d84e42" : "#76517e";
     context.globalAlpha = (0.025 + next() * 0.13) * coronaAlpha;
@@ -121,11 +148,11 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   const ejectMarks = detail === 0 ? 70 : detail === 1 ? 150 : 250;
   for (let index = 0; index < ejectMarks; index++) {
     const angle =
-      -2.58 + next() * 0.53 + Math.sin(phase * 0.34 + index * 0.08) * 0.055;
+      -2.58 + next() * 0.53 + Math.sin(motion * 0.34 + index * 0.08) * 0.055;
     const distance =
       radius *
       (1.2 + next() * 2.6) *
-      (1 + Math.sin(phase * 0.48 + index * 0.13) * 0.065);
+      (1 + Math.sin(motion * 0.48 + index * 0.13) * 0.065);
     const start = radius * (0.35 + next() * 0.5);
     const x1 = centerX + Math.cos(angle) * start;
     const y1 = centerY + Math.sin(angle) * start * 0.58;
@@ -158,13 +185,16 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   ember.addColorStop(0.8, "#452143");
   ember.addColorStop(1, "#020203");
   context.fillStyle = ember;
-  context.globalAlpha = Math.min(1, 0.62 + scene.shock * 0.38);
+  context.globalAlpha = Math.min(
+    1,
+    0.56 + vital.breath * 0.12 + vital.pulse * 0.17 + scene.shock * 0.26,
+  );
   context.beginPath();
   context.arc(0, 0, coreRadius * 1.42, 0, Math.PI * 2);
   context.fill();
   drawScorchedSurface(context, coreRadius, seed, detail, scene.shock);
   // Electron-orbit metaphor only: authored planes share the wounded nucleus.
-  // Eccentricity, precession and passing phases differ; the camera never wanders.
+  // Eccentricity, precession and passing phases differ around one world anchor.
   const filament = random(seed ^ 0x32bfa1);
   const rings = detail === 0 ? 14 : detail === 1 ? 26 : 40;
   for (let ring = 0; ring < rings; ring++) {
@@ -174,6 +204,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
     const rate = (0.045 + filament() * 0.13) * (ring % 2 === 0 ? 1 : -1);
     const offset = filament() * Math.PI * 2;
     const whipPhase = filament() * Math.PI * 2;
+    const delayed = vitalMotion(phase - 0.1 - (ring % 7) * 0.065, seed);
     const particle =
       ((ring * 7) % installation.world.parameters.particleCount) * 2;
     const strainAngle = Math.atan2(
@@ -184,7 +215,8 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
       plane +
       motion * rate +
       strainAngle * 0.13 +
-      Math.sin(motion * 1.7 + offset) * 0.055;
+      (delayed.breath - vital.breath) * 0.24 +
+      delayed.release * (ring % 2 === 0 ? 0.08 : -0.06);
     const c = Math.cos(angleOfPlane);
     const sn = Math.sin(angleOfPlane);
     const head = offset + motion * (0.38 + Math.abs(rate) * 4);
@@ -192,11 +224,13 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
       const nearPass = Math.sin(angle * 2 + whipPhase + motion * 0.27);
       const whip =
         Math.pow(Math.max(0, Math.cos(angle - head)), 12) *
-        (0.08 + opening * 1.6);
+        (0.08 + opening * 1.2 + delayed.release * 0.3);
       const reach =
         orbitRadius *
         (1 -
-          pressure * 0.06 +
+          pressure * 0.03 +
+          delayed.breath * 0.06 -
+          delayed.resistance * 0.035 +
           nearPass * 0.085 +
           whip +
           Math.sin(angle * 19 + whipPhase) * 0.019 +
@@ -352,6 +386,13 @@ export function RuptureBackdrop({
     const render = () => drawRupture(canvas, installation);
     const observer = new ResizeObserver(render);
     observer.observe(canvas);
+    const resetWallTime = () => {
+      previous = performance.now();
+      lastDraw = 0;
+      clock.discard();
+      installation.budget.discard();
+    };
+    document.addEventListener("visibilitychange", resetWallTime);
     render();
     const animate = (now: number) => {
       const elapsed = Math.max(0, (now - previous) / 1000);
@@ -391,6 +432,7 @@ export function RuptureBackdrop({
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      document.removeEventListener("visibilitychange", resetWallTime);
     };
   }, [installation]);
   return (
