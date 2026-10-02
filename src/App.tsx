@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Installation } from "./core/installation.ts";
 import { DEFAULT_PARAMETERS } from "./core/orbit.ts";
 import { RuptureBackdrop } from "./render/RuptureBackdrop.tsx";
+import { AmbientSound } from "./media/AmbientSound.tsx";
 
 export function App() {
   const installation = useMemo(
@@ -26,6 +27,7 @@ export function App() {
   return (
     <main aria-label="Starwound: a wounded living field">
       <RuptureBackdrop installation={installation} paused={reducedMotion} />
+      <AmbientSound />
     </main>
   );
 }

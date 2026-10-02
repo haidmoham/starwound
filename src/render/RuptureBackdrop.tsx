@@ -5,6 +5,7 @@ import { syntheticForcing } from "../core/forcing.ts";
 import { drawScorchedSurface } from "./ScorchedSurface.ts";
 import { vitalMotion } from "./VitalMotion.ts";
 import { drawWoundBloom } from "./WoundBloom.ts";
+import { cameraDrift } from "./CameraDrift.ts";
 
 function random(seed: number) {
   let state = seed >>> 0;
@@ -65,6 +66,12 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.fillStyle = "#020203";
   context.fillRect(0, 0, width, height);
   context.save();
+  // Move the observer through the quiet field, never the body's own anchor.
+  // The whole anatomy shares this restrained camera; there is no shake.
+  const camera = cameraDrift(phase);
+  context.translate(centerX - camera.x * size, centerY - camera.y * size);
+  context.scale(camera.scale, camera.scale);
+  context.translate(-centerX, -centerY);
   context.translate(centerX, centerY);
   context.rotate(
     vital.resistance * 0.09 - vital.breath * 0.035 + vital.release * 0.08,
@@ -187,7 +194,7 @@ function drawRupture(canvas: HTMLCanvasElement, installation: Installation) {
   context.fill();
   drawScorchedSurface(context, coreRadius, seed, detail, scene.shock);
   // Electron-orbit metaphor only: authored planes share the wounded nucleus.
-  // Eccentricity, precession and passing phases differ; the camera never wanders.
+  // Eccentricity, precession and passing phases differ around one world anchor.
   const filament = random(seed ^ 0x32bfa1);
   const rings = detail === 0 ? 14 : detail === 1 ? 26 : 40;
   for (let ring = 0; ring < rings; ring++) {
@@ -379,6 +386,13 @@ export function RuptureBackdrop({
     const render = () => drawRupture(canvas, installation);
     const observer = new ResizeObserver(render);
     observer.observe(canvas);
+    const resetWallTime = () => {
+      previous = performance.now();
+      lastDraw = 0;
+      clock.discard();
+      installation.budget.discard();
+    };
+    document.addEventListener("visibilitychange", resetWallTime);
     render();
     const animate = (now: number) => {
       const elapsed = Math.max(0, (now - previous) / 1000);
@@ -418,6 +432,7 @@ export function RuptureBackdrop({
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      document.removeEventListener("visibilitychange", resetWallTime);
     };
   }, [installation]);
   return (
