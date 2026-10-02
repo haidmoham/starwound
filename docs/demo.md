@@ -1,5 +1,7 @@
 # Demo captures
 
+The captures below document historical versions. They do not show the current direct-opening wounded-star installation. A new verified capture is still needed before presenting a video as the current work.
+
 ## Tidal installation
 
 The finished 10-second, 1080 × 1350, silent H.264 cut is at `~/Desktop/demos/starwound-tidal-v1.mp4`. It records the live `starwound.mhaider.dev` installation: the framed entrance, a move into the full field, and the eject study. It uses the browser's Canvas 2D fallback because WebGL was unavailable in the capture browser.

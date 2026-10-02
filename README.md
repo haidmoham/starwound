@@ -1,18 +1,14 @@
 # Starwound
 
-An interstellar generative-art installation for the browser. A deterministic softened-Newtonian particle world keeps moving without sound. Its trajectories pass through an authored field of projected light, rupture, and debris.
+One wounded being in the void. It opens directly into motion with no visible copy, menus, decorative framing, or audio picker. Purple bruising, charred matter, a brutal irregular gash, living filaments and root-born ejecta inhabit one fixed nucleus. A restrained camera drifts through the quiet field without disturbing the body's own anchor.
 
-The entrance accepts any YouTube video link, or no link. The video plays in a small movable dock beside the artwork. Collapsing the dock keeps its iframe mounted. It does not drive the model or renderer. The scene is an installation, not an audio visualizer.
+The entire public artwork is one Canvas 2D field. One seeded, fixed-step particle world and its autonomous drive feed the body's pressure, contraction, tearing and release. The anatomy is authored generative art, not a simulated biological organism or relativistic star. Reduced-motion preferences hold the image and camera still; hidden tabs suspend progression and resume without catch-up.
 
-## Experience
-
-The opening presents one framed study in a quiet gallery space. Entering expands that same running world to the viewport. The `fall`, `shear`, and `eject` studies change initial conditions and restart the world. Freeze, restart, still export, and a small tuning sheet remain available. The YouTube dock accepts watch, short, live, embed, and `youtu.be` links; a video can forbid embedding, in which case the dock offers an ordinary YouTube link.
-
-The orbital trajectories come from seeded test particles around one fixed softened attractor with a bounded autonomous external drive. The tilted incandescent annulus and black center are authored presentation. They are not general relativity, an accretion simulation, or gravitational lensing. The drawn rupture evolves slowly; freeze stops both the world and that presentation motion.
+The quiet sound icon starts an original ominous ambient bed, generated locally with Web Audio. Sound is off until a deliberate click or keyboard activation, fades in gently, and can be muted with the same control. Hidden tabs suspend the sound too. No recording, external audio service or uploaded file is involved; the artwork remains complete in silence.
 
 ## Development
 
-React, TypeScript, Vite, Three.js, plain CSS, and npm. No backend, credentials, media upload, or paid service is required.
+React, TypeScript, Vite, Canvas 2D and npm. The existing Three.js and local-media experiments remain in source history/modules but are not imported into the public experience. No backend, credentials, uploaded media, or paid service is needed.
 
 ```sh
 npm ci
@@ -21,13 +17,8 @@ npm run check
 npm run build
 ```
 
-WebGL draws the trajectories when available; Canvas 2D is the fallback. Both use the same projected geometry. The artwork respects reduced motion and pauses when the tab is hidden. The `starwound.x.dev` shorthand means mirrored release to `starwound.shin86.dev` and `starwound.mhaider.dev`.
+Rendering detail, pixel density and redraw rate adapt within bounded budgets without altering fixed simulation steps. `?profile=1` exposes rolling frame/draw statistics through `document.documentElement.dataset.starwoundProfile`. Cloud measurements do not establish physical-device performance.
 
-## Project notes
+The owner approved the reviewed installation for landing on October 2, 2026. Production mirrors are `starwound.shin86.dev` and `starwound.mhaider.dev`; verify each host separately. Remaining work is tracked in [todo.md](todo.md).
 
-- [AGENTS.md](AGENTS.md): current operating contract.
-- [docs/brief.md](docs/brief.md): art direction and source transformations.
-- [docs/architecture.md](docs/architecture.md): model and rendering boundaries.
-- [docs/verification.md](docs/verification.md): observed checks and release evidence.
-
-The first release explored local audio forcing. The owner's later direction explicitly removed audio reactivity. Historical checks remain in the verification ledger; the current experience has no local audio ingestion. No commercial recording, film footage, paid font, or third-party artwork is bundled.
+See [brief](docs/brief.md), [architecture](docs/architecture.md), and the chronological [verification ledger](docs/verification.md).

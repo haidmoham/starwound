@@ -2,28 +2,19 @@
 
 ## Current direction
 
-Starwound should feel like an art installation in someone's browser. Its subject is interstellar physics and autonomous generative behavior. It is explicitly not a visualizer: a YouTube video, expected but not required to be a song, sits beside the work and never affects its state.
+The owner approved the purple grunge material, then superseded the entire UI: no visible copy, choices, menus or decorative framing. One autonomous being fills the experience immediately. The local music picker, title, former controls, distant star, surrounding planes and full-field scanline layer are absent from the public scene.
 
-The entrance takes an optional YouTube link. A framed, already-living artwork sits in a quiet gallery space. Entering carries the same world into a full-viewport field; the scene does not restart. Controls recede to the edges. A compact listening dock can move without taking over the work. The piece must remain complete in silence.
+On October 2 the owner confirmed that the tone is correct and requested only polish, camera panning and basic ominous music. Preserve the accepted material, palette and labored motion. The observer makes a slow bounded drift with a very slight change of distance; it does not orbit wildly, shake, or introduce a new composition. A small sound icon is the sole interaction, providing deliberate opt-in and easy mute for an original restrained procedural ambient bed. This request does not reopen a broader aesthetic redesign.
 
-## Visual thesis
+A fixed wounded nucleus should feel brutally alive, surrounded by a quiet void. Purple bruises and filthy bone/red heat live within charred, ragged matter. The gash, torn filaments, curling lily-like anatomy and ejected fragments must react as one body. Violence is carried by deformation, tearing and acceleration, never rapid full-field white flashes or camera shake. Longing and ache remain in the dark interval around the living material.
 
-A tidal rupture: a tilted incandescent annulus, a hard black center, asymmetric red ejecta, needle-white ballistic trajectories, and sparse cold stars. Violence comes from shear, scale, accumulated paths, and escaping matter. Keep black gaps. Avoid constant flashes, uniform bloom, random shake, or generic nebula wallpaper. The brightest marks should have a place and a duration.
-
-The orbital paths are modeled. The illuminated ring and ejecta are authored presentation around that model, not a claim of general relativity or a physically simulated black hole. Use precise labels when a scientific approximation matters.
+The shared autonomous drive contracts the body, opens the tear, whips filaments and launches root-born cohorts. Actual model positions contribute radial strain and filament orientation; modeled departures intensify the release. This is authored causal presentation, not a biological or stellar-fluid simulation.
 
 ## Source transformations
 
-- `haidmoham/seaglass`: framed-to-immersive stage, oversized entrance action, compact controls, and movable media dock. Adapt the interaction hierarchy; do not copy its weather subject or audio-driven scene.
-- `wintery.shin86.dev`: a quiet gallery, substantial frame, small placard, and sparse navigation around a dominant artwork. Adapt the presentation to an autonomous dark field rather than a set of borrowed images.
-- The implementation keeps controls spatially stable on mobile and concentrates the strongest color and motion at the rupture.
+- Evangelion: [Criterion’s illustrated feature](https://www.criterion.com/current/posts/9281-the-inner-worlds-of-neon-genesis-evangelion) and its published stills were inspected. Oppressive scale, organic/mechanical tension and confronting stillness informed the work. No symbols, characters or footage copied.
+- Seattle grunge: [MOPOP’s Nirvana exhibition](https://www.mopop.org/exhibitions/nirvana-taking-punk-to-the-masses) and its exhibit photograph were inspected for distressed physical reproduction. The owner rejected the photocopy typography and then removed all typography. The damaged material remains original procedural geometry.
+- Spider lilies: the official Tokyo Ghoul ED1 page was verified but its video frames stalled. A Tokyo Ghoul-associated lily still was inspected for recurved petals and thin extended stamens; exact ending provenance was not verified. No reference pixels copied.
+- 86: restraint, distance and loss remain emotional influences.
 
-## Review questions
-
-- Does the art read as an installation before any link is supplied?
-- Does entry preserve the running world and the selected video?
-- Do the motion and the scene remain compelling with no media playing?
-- At 390 px, are the artwork, exit, controls, and dock reachable without collision?
-- Do `fall`, `shear`, and `eject` yield different trajectories under the same deterministic rules?
-
-The initial brief proposed music-conditioned simulation. The owner superseded that direction with the explicit non-visualizer instruction. The old brief survives in Git history.
+The installation is complete in silence. Historical media experiments remain excluded from the public bundle. Optional ambient music is generated locally through Web Audio; no recording is published.
