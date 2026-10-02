@@ -30,4 +30,4 @@ The public entry point no longer imports the separate WebGL trajectory renderer,
 
 ## Release
 
-Vercel previews follow the feature branch. Main and production mirrors remain held for visual review. No user audio or reference artwork is bundled. See the chronological verification ledger for observed evidence and historical renderer limits.
+Vercel previews follow feature branches; production follows main and mirrors the installation at `starwound.shin86.dev` and `starwound.mhaider.dev`. The owner approved landing the reviewed installation on October 2, 2026. No user audio or reference artwork is bundled. See the chronological verification ledger for observed evidence and historical renderer limits.

@@ -19,6 +19,6 @@ npm run build
 
 Rendering detail, pixel density and redraw rate adapt within bounded budgets without altering fixed simulation steps. `?profile=1` exposes rolling frame/draw statistics through `document.documentElement.dataset.starwoundProfile`. Cloud measurements do not establish physical-device performance.
 
-Main and production mirrors are held for visual review. The owner's `starwound.x.dev` shorthand means both `starwound.shin86.dev` and `starwound.mhaider.dev`.
+The owner approved the reviewed installation for landing on October 2, 2026. Production mirrors are `starwound.shin86.dev` and `starwound.mhaider.dev`; verify each host separately. Remaining work is tracked in [todo.md](todo.md).
 
 See [brief](docs/brief.md), [architecture](docs/architecture.md), and the chronological [verification ledger](docs/verification.md).
