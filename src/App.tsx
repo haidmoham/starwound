@@ -27,6 +27,9 @@ export function App() {
   return (
     <main aria-label="Starwound: a wounded living field">
       <RuptureBackdrop installation={installation} paused={reducedMotion} />
+      <a className="cluster-return" href="https://shin86.dev/">
+        ← shin86.dev
+      </a>
       <AmbientSound />
     </main>
   );
