@@ -67,3 +67,30 @@ main {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+.cluster-return {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 22px;
+  color: #cfc3cc;
+  font: 12px/1.4 system-ui, sans-serif;
+  text-decoration: none;
+}
+.cluster-return:hover,
+.cluster-return:focus-visible {
+  background: #211b2580;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cluster-return:focus-visible {
+  outline: 1px solid #cfc3cc;
+  outline-offset: 2px;
+}
+.cluster-return:active {
+  background: #352b3c;
+}

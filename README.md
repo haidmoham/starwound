@@ -1,6 +1,6 @@
 # Starwound
 
-One wounded being in the void. It opens directly into motion with no visible copy, menus, decorative framing, or audio picker. Purple bruising, charred matter, a brutal irregular gash, living filaments and root-born ejecta inhabit one fixed nucleus. A restrained camera drifts through the quiet field without disturbing the body's own anchor.
+One wounded being in the void. It opens directly into motion with no artwork copy, menus, decorative framing, or audio picker. Purple bruising, charred matter, a brutal irregular gash, living filaments and root-born ejecta inhabit one fixed nucleus. A restrained camera drifts through the quiet field without disturbing the body's own anchor.
 
 The entire public artwork is one Canvas 2D field. One seeded, fixed-step particle world and its autonomous drive feed the body's pressure, contraction, tearing and release. The anatomy is authored generative art, not a simulated biological organism or relativistic star. Reduced-motion preferences hold the image and camera still; hidden tabs suspend progression and resume without catch-up.
 
@@ -22,3 +22,7 @@ Rendering detail, pixel density and redraw rate adapt within bounded budgets wit
 The owner approved the reviewed installation for landing on October 2, 2026. Production mirrors are `starwound.shin86.dev` and `starwound.mhaider.dev`; verify each host separately. Remaining work is tracked in [todo.md](todo.md).
 
 See [brief](docs/brief.md), [architecture](docs/architecture.md), and the chronological [verification ledger](docs/verification.md).
+
+## cluster navigation — october 3
+
+the owner approved a minimal `← shin86.dev` return link as an exception to the wordless artwork direction. it sits at bottom left opposite the sound icon, with safe-area spacing and visible keyboard focus. it does not intercept the canvas, change the sound flow, or affect the model.

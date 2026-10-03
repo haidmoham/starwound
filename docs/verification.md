@@ -221,3 +221,10 @@ Codex should generate and commit `package-lock.json`, switch CI to `npm ci`, rep
 - Reviewed source is PR #11 at `3b1d398349ba97a13669f658a770ec0d87597b31`, stacked on PR #10 and PR #9. Exact-lock GitHub Checks run [37036588344](https://github.com/haidmoham/starwound/actions/runs/37036588344) passed the complete checks and production build.
 - The landing preparation adds the requested `improve music` item to root `todo.md` and updates release status documentation. Application source, generated sound, art, camera and dependency lockfile are unchanged from the reviewed tree.
 - Merge and production deployment receipts are recorded in the corresponding pull requests once observed. Each production mirror must be checked separately against the final main deployment. No new physical iPhone, PCM or performance measurement is claimed.
+
+## cluster return navigation — 2026-10-03, local draft
+
+- isolated branch `codex/cluster-return-link` starts from approved production `bc342b8`; original mac checkout and its untracked collaborator files remain untouched.
+- `npm run check` passes TypeScript, Oxlint and all 30 existing tests. `npm run build -- --configLoader runner` passes; the default loader was blocked from writing into the reused read-only dependency cache. existing installed dependencies were reused, with no package changes.
+- browser checked 1280 × 720 and 390 × 844: one artwork canvas, visible bottom-left return link, separate bottom-right sound control, no horizontal overflow. tab focuses the return link; enter navigates to `https://shin86.dev/`. sound activation changed its accessible label to mute and muting restored play. this check confirms UI state, not physical speaker audibility.
+- navigation-only change leaves rendering, simulation and audio code unchanged. main merge and mirrored production release remain unapproved.
